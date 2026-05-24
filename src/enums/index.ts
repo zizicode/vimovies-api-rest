@@ -2,6 +2,7 @@ export * from './media.enum'
 export * from './person.enum'
 export * from './sitemap.enum'
 export * from './plataform.enum'
+export * from './article.enum'
 
 export enum SupportedLocale {
     ES = 'es',

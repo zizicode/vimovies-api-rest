@@ -1,5 +1,8 @@
-export * from './media.types'
-export * from './genres.types'
+export * from './media.type'
+export * from './genres.type'
 export * from './person.type'
 export * from './articleFaQ.type'
+export * from './plataform.type'
+export * from './articles.type'
+export * from './curated-list.type'
 

@@ -1,6 +1,9 @@
 import { MediaController } from '@/controllers/media.controller'
+import { MediaVideosController } from '@/controllers/media-videos.controller'
 import { createAuthMiddleware } from '@/utils/auth.utils'
 import { Hono } from 'hono'
+import { MediaCreditsController } from '@/controllers/media-credits.controller'
+import { MediaWatchProvidersController } from '@/controllers/media-watch-providers.controller'
 export const mediaRoutes = new Hono()
 
 // ── Admin Routes ───────────────────────────────────────────────────────────
@@ -30,40 +33,40 @@ mediaRoutes.post('/admin/:id/genres', MediaController.syncGenres)
 mediaRoutes.post('/admin/:id/videos', MediaController.syncVideos)
 
 // GET /admin/media/:id/videos/list
-// mediaRoutes.get('/admin/:id/videos/list', MediaVideosController.getVideos)
+mediaRoutes.get('/admin/:id/videos/list', MediaVideosController.getVideos)
 
 // // POST /admin/media/:id/videos/single
-// mediaRoutes.post('/admin/:id/videos/single', MediaVideosController.addVideo)
+mediaRoutes.post('/admin/:id/videos/single', MediaVideosController.addVideo)
 
 // // DELETE /admin/media/:id/videos/:videoId
-// mediaRoutes.delete('/admin/:id/videos/:videoId', MediaVideosController.removeVideo)
+mediaRoutes.delete('/admin/:id/videos/:videoId', MediaVideosController.removeVideo)
 
 // // PATCH /admin/media/:id/videos/:videoId
-// mediaRoutes.patch('/admin/:id/videos/:videoId', MediaVideosController.updateVideo)
+mediaRoutes.patch('/admin/:id/videos/:videoId', MediaVideosController.updateVideo)
 
 // // GET /admin/media/:id/credits
-// mediaRoutes.get('/admin/:id/credits', MediaCreditsController.getCredits)
+mediaRoutes.get('/admin/:id/credits', MediaCreditsController.getCredits)
 
 // // POST /admin/media/:id/credits
-// mediaRoutes.post('/admin/:id/credits', MediaCreditsController.addCredit)
+mediaRoutes.post('/admin/:id/credits', MediaCreditsController.addCredit)
 
 // // DELETE /admin/media/:id/credits/:creditId
-// mediaRoutes.delete('/admin/:id/credits/:creditId', MediaCreditsController.removeCredit)
+mediaRoutes.delete('/admin/:id/credits/:creditId', MediaCreditsController.removeCredit)
 
 // // PATCH /admin/media/:id/credits/:creditId/order
-// mediaRoutes.patch('/admin/:id/credits/:creditId/order', MediaCreditsController.updateCreditOrder)
+mediaRoutes.patch('/admin/:id/credits/:creditId/order', MediaCreditsController.updateCreditOrder)
 
 // // GET /admin/media/:id/providers
-// mediaRoutes.get('/admin/:id/providers', MediaWatchProvidersController.getProviders)
+mediaRoutes.get('/admin/:id/providers', MediaWatchProvidersController.getProviders)
 
 // // POST /admin/media/:id/providers
-// mediaRoutes.post('/admin/:id/providers', MediaWatchProvidersController.addProvider)
+mediaRoutes.post('/admin/:id/providers', MediaWatchProvidersController.addProvider)
 
 // // DELETE /admin/media/:id/providers/:providerId
-// mediaRoutes.delete('/admin/:id/providers/:providerId', MediaWatchProvidersController.removeProvider)
+mediaRoutes.delete('/admin/:id/providers/:providerId', MediaWatchProvidersController.removeProvider)
 
 // // PATCH /admin/media/:id/providers/:providerId
-// mediaRoutes.patch('/admin/:id/providers/:providerId', MediaWatchProvidersController.updateProvider)
+mediaRoutes.patch('/admin/:id/providers/:providerId', MediaWatchProvidersController.updateProvider)
 
 // ── Public Routes ────────────────────────────────────────────────────────
 

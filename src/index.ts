@@ -4,7 +4,7 @@ import { cors } from 'hono/cors'
 import { env } from './config/env'
 import routes from './routes'
 import { initializeSocket } from './socket'
-import { initCronJobs } from './cron/jobs'
+// import { initCronJobs } from './cron/jobs'
 import type { Server } from 'node:http'
 
 const app = new Hono()
@@ -35,4 +35,4 @@ const server = serve({
 })
 
 initializeSocket(server as Server)
-initCronJobs()
+// initCronJobs()
