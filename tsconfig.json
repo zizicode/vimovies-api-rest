@@ -1,0 +1,86 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ES2022",
+    "moduleResolution": "bundler",
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "baseUrl": "./src",
+
+    "paths": {
+      "@/*": ["*"],
+      "@config/*": ["config/*"],
+      "@routes/*": ["routes/*"],
+      "@services/*": ["services/*"],
+      "@controllers/*": ["controllers/*"],
+      "@repositories/*": ["repositories/*"],
+      "@middlewares/*": ["middlewares/*"],
+      "@utils/*": ["utils/*"],
+      "@types/*": ["types/*"]
+    },
+
+    /* =========================
+     * Strictness
+     * ========================= */
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+
+    /* =========================
+     * Code Quality
+     * ========================= */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+
+    /* =========================
+     * Interop
+     * ========================= */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+
+    /* =========================
+     * Emit
+     * ========================= */
+    "declaration": true,
+    "sourceMap": true,
+    "removeComments": false,
+
+    /* =========================
+     * Performance
+     * ========================= */
+    "incremental": true,
+    "skipLibCheck": true,
+
+    /* =========================
+     * Types
+     * ========================= */
+    "types": ["node"],
+
+    /* =========================
+     * Safety
+     * ========================= */
+    "forceConsistentCasingInFileNames": true,
+
+    /* =========================
+     * Experimental
+     * ========================= */
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
+
+  "include": ["src"],
+
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".turbo",
+    ".next"
+  ]
+}
