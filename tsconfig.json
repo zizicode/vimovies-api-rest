@@ -1,14 +1,20 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2022"],
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "ignoreDeprecations": "5.0",
-    "rootDir": "./src",
-    "outDir": "./dist",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "baseUrl": "./src",
-
     "paths": {
       "@/*": ["*"],
       "@config/*": ["config/*"],
@@ -19,69 +25,8 @@
       "@middlewares/*": ["middlewares/*"],
       "@utils/*": ["utils/*"],
       "@types/*": ["types/*"]
-    },
-
-    /* =========================
-     * Strictness
-     * ========================= */
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-
-    /* =========================
-     * Code Quality
-     * ========================= */
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-
-    /* =========================
-     * Interop
-     * ========================= */
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-
-    /* =========================
-     * Emit
-     * ========================= */
-    "declaration": true,
-    "sourceMap": true,
-    "removeComments": false,
-
-    /* =========================
-     * Performance
-     * ========================= */
-    "incremental": true,
-    "skipLibCheck": true,
-
-    /* =========================
-     * Types
-     * ========================= */
-    "types": ["node"],
-
-    /* =========================
-     * Safety
-     * ========================= */
-    "forceConsistentCasingInFileNames": true,
-
-    /* =========================
-     * Experimental
-     * ========================= */
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    }
   },
-
   "include": ["src"],
-
-  "exclude": [
-    "node_modules",
-    "dist",
-    ".turbo",
-    ".next"
-  ]
+  "exclude": ["node_modules", "dist"]
 }
