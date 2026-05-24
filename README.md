@@ -2,39 +2,40 @@
 
 Backend API para vimovies.com con soporte para WebSocket y REST.
 
-## ConfiguraciÃ³n para Render
+## Configuración para Render
 
 ### Variables de Entorno
 En Render, configura las siguientes variables de entorno:
 
-- `PORT` - Render asigna automÃ¡ticamente (deja vacÃ­o o usa 3000)
-- `SUPABASE_URL` - URL de tu proyecto Supabase
-- `SUPABASE_ANON_KEY` - Clave anÃ³nima de Supabase
-- `NODE_ENV` - production
+- PORT - Render asigna automáticamente (deja vacío o usa 3000)
+- SUPABASE_URL - URL de tu proyecto Supabase
+- SUPABASE_ANON_KEY - Clave anónima de Supabase
+- NODE_ENV - production
 
 ### Build Command
-```
+\\\ash
 npm install
-```
+\\\
 
 ### Start Command
-```
+\\\ash
 npm start
-```
+\\\
 
 ## Desarrollo Local
 
-1. Copia `.env.example` a `.env`
+1. Copia .env.example a .env
 2. Configura las variables de entorno
 3. Ejecuta:
-```bash
+\\\ash
 npm run dev
-```
+\\\
 
-## CaracterÃ­sticas
+## Características
 
-- âœ… REST API con Hono
-- âœ… WebSocket con Socket.io
-- âœ… CORS configurado para www.vimovies.com y localhost
-- âœ… Soporte para Supabase
-- âœ… Jobs programados con node-cron
+- ? REST API con Hono
+- ? WebSocket con Socket.io
+- ? CORS configurado para www.vimovies.com y localhost
+- ? Soporte para Supabase
+- ? Jobs programados con node-cron
+- ? Ejecución con tsx para ES modules
