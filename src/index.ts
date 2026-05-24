@@ -1,10 +1,10 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import { env } from './config/env'
-import routes from './routes/index'
-import { initSocket } from './socket/index'
-import { initCronJobs } from './cron/jobs'
+import { env } from './config/env.js'
+import routes from './routes/index.js'
+import { initSocket } from './socket/index.js'
+import { initCronJobs } from './cron/jobs.js'
 import type { Server } from 'node:http'
 
 const app = new Hono()
