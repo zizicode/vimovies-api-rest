@@ -27,6 +27,6 @@
       "@types/*": ["types/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "scripts/gen-hashes.ts"],
   "exclude": ["node_modules", "dist"]
 }
