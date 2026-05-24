@@ -4,7 +4,12 @@ import type { Server } from 'node:http'
 export const initSocket = (server: Server) => {
   const io = new SocketIOServer(server, {
     cors: {
-      origin: '*'
+      origin: [
+        'https://www.vimovies.com',
+        'http://localhost:5173',
+        'http://localhost:3000'
+      ],
+      credentials: true
     }
   })
 

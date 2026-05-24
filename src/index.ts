@@ -9,7 +9,14 @@ import type { Server } from 'node:http'
 
 const app = new Hono()
 
-app.use('*', cors())
+app.use('*', cors({
+  origin: [
+    'https://www.vimovies.com',
+    'http://localhost:5173',
+    'http://localhost:3000'
+  ],
+  credentials: true
+}))
 
 app.get('/', (c) => {
   return c.json({
