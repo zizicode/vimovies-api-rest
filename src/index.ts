@@ -3,7 +3,7 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { env } from './config/env'
 import routes from './routes'
-import { initSocket } from './socket'
+import { initializeSocket } from './socket'
 import { initCronJobs } from './cron/jobs'
 import type { Server } from 'node:http'
 
@@ -31,8 +31,8 @@ const server = serve({
   fetch: app.fetch,
   port: env.PORT
 }, (info) => {
-  console.log(`🚀 Server running on http://localhost:${info.port}`)
+  console.log(`[API] Running on http://localhost:${info.port}/api`)
 })
 
-initSocket(server as Server)
+initializeSocket(server as Server)
 initCronJobs()
