@@ -27,14 +27,14 @@ export const paginated = <T>(
     total,
     pages: Math.ceil(total / per_page),
   }
-  return c.json({ success: true, data, meta }, 200 as 200)
+  return c.json({ success: true, data, meta }, 200 as const)
 }
 
 export const notFound = (c: Context, message = 'Resource not found') =>
-  c.json({ success: false, error: message }, 404 as 404)
+  c.json({ success: false, error: message }, 404 as const)
 
 export const serverError = (c: Context, error: unknown) => {
   const message = error instanceof Error ? error.message : 'Internal server error'
   console.error('[ServerError]', error)
-  return c.json({ success: false, error: message }, 500 as 500)
+  return c.json({ success: false, error: message }, 500 as const)
 }

@@ -1,6 +1,7 @@
-import { ContentStatus, ArticleIntent, SupportedLocale, SitemapPriority } from "@/enums"
 import { ArticleFAQ } from "./articleFaQ.type"
 import { Media } from "./media.type"
+
+import { ContentStatus, ArticleIntent, SupportedLocale, SitemapPriority } from "@/enums"
 
 export interface ArticleFilters {
   page?: number

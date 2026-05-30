@@ -1,5 +1,57 @@
 import { supabase } from "@/config/supabase"
+import { PlatformType, SitemapPriority } from "@/enums"
 import { CatalogItem, CreatePlatformInput, MediaWatchProvider, Platform, PlatformWithCatalog, UpdatePlatformInput, WatchProviderInput } from "@/types"
+
+// Normalizar platform_type: convertir valores antiguos a nuevos valores del enum
+function normalizePlatformType(type: string | undefined): PlatformType {
+    if (!type) return PlatformType.SVOD
+    
+    const typeLower = type.toLowerCase()
+    
+    // Mapeo de valores antiguos a nuevos
+    const oldToNew: Record<string, PlatformType> = {
+        'streaming': PlatformType.SVOD,
+        'svod': PlatformType.SVOD,
+        'tv': PlatformType.Broadcast,
+        'tvod': PlatformType.TVOD,
+        'rental': PlatformType.TVOD,
+        'buy': PlatformType.TVOD,
+        'cable': PlatformType.Cable,
+        'broadcast': PlatformType.Broadcast,
+        'avod': PlatformType.AVOD,
+    }
+    
+    // Si el valor ya es válido, retornarlo
+    if (Object.values(PlatformType).includes(type as PlatformType)) {
+        return type as PlatformType
+    }
+    
+    // Si es un valor antiguo, mapearlo al nuevo
+    return oldToNew[typeLower] || PlatformType.SVOD
+}
+
+// Normalizar sitemap_priority: convertir valores numéricos a valores del enum
+function normalizeSitemapPriority(priority: string | undefined): SitemapPriority {
+    if (!priority) return SitemapPriority.Low
+    
+    // Si el valor ya es válido, retornarlo
+    if (Object.values(SitemapPriority).includes(priority as SitemapPriority)) {
+        return priority as SitemapPriority
+    }
+    
+    // Mapeo de valores numéricos a enum
+    const numericToEnum: Record<string, SitemapPriority> = {
+        '1.0': SitemapPriority.Critical,
+        '0.9': SitemapPriority.High,
+        '0.8': SitemapPriority.Medium,
+        '0.7': SitemapPriority.Medium,
+        '0.5': SitemapPriority.Low,
+        '0.3': SitemapPriority.Minimal,
+        '0.1': SitemapPriority.Minimal,
+    }
+    
+    return numericToEnum[priority] || SitemapPriority.Low
+}
 
 export const PlatformsService = {
 
@@ -153,9 +205,16 @@ export const PlatformsService = {
      * Este método es para agregar nuevas plataformas desde el dashboard.
      */
     async create(input: CreatePlatformInput): Promise<Platform> {
+        // Normalizar valores antes de insertar
+        const normalizedInput = {
+            ...input,
+            platform_type: normalizePlatformType(input.platform_type),
+            sitemap_priority: normalizeSitemapPriority(input.sitemap_priority),
+        }
+        
         const { data, error } = await supabase
             .from('platforms')
-            .insert(input)
+            .insert(normalizedInput)
             .select()
             .single()
 
@@ -168,9 +227,20 @@ export const PlatformsService = {
      * No permite cambiar el slug.
      */
     async update(id: number, input: UpdatePlatformInput): Promise<Platform> {
+        // Normalizar valores antes de actualizar
+        const normalizedInput: UpdatePlatformInput = { ...input }
+        
+        if (input.platform_type) {
+            normalizedInput.platform_type = normalizePlatformType(input.platform_type)
+        }
+        
+        if (input.sitemap_priority) {
+            normalizedInput.sitemap_priority = normalizeSitemapPriority(input.sitemap_priority)
+        }
+        
         const { data, error } = await supabase
             .from('platforms')
-            .update(input)
+            .update(normalizedInput)
             .eq('id', id)
             .select()
             .single()

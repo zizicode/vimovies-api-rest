@@ -1,6 +1,7 @@
+import { Hono } from "hono"
+
 import { ArticlesController } from "@/controllers/articles.controller"
 import { createAuthMiddleware } from "@/utils"
-import { Hono } from "hono"
 
 export const articlesRoutes = new Hono()
 

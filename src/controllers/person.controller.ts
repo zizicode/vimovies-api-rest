@@ -1,6 +1,7 @@
+import { Context } from "hono"
+
 import { PersonService } from "@/services/persons.service"
 import { notFound, ok, paginated, serverError } from "@/utils"
-import { Context } from "hono"
 
 export const PeopleController = {
 

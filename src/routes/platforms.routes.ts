@@ -1,6 +1,7 @@
+import { Hono } from "hono"
+
 import { PlatformsController } from "@/controllers/platfroms.conroller"
 import { createAuthMiddleware } from "@/utils"
-import { Hono } from "hono"
 
 export const platformsRoutes = new Hono()
 

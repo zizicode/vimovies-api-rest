@@ -1,5 +1,5 @@
 import { supabase } from "@/config/supabase"
-import { Media, MediaDetail, MediaFilters, MediaListResult, MediaRating, MediaVideo, PatchMediaInput, SyncVideoInput, UpdateEditorialInput, UpsertMediaInput, UpsertRatingInput } from "@/types"
+import { Media, MediaDetail, MediaFilters, MediaListResult, PatchMediaInput, SyncVideoInput, UpdateEditorialInput, UpsertMediaInput, UpsertRatingInput } from "@/types"
 
 export const MediaService = {
     /**
@@ -60,7 +60,7 @@ export const MediaService = {
             const { data, error, count } = await query
             if (error) throw error
 
-            let transformedData = (data ?? []).map((media: any) => ({
+            const transformedData = (data ?? []).map((media: any) => ({
                 ...media,
                 genre_ids: media.media_genres?.map((mg: any) => mg.genre_id) || [],
                 media_genres: undefined,
@@ -231,8 +231,8 @@ export const MediaService = {
                 ...c,
                 person: c.person?.[0]
             })),
-            videos: (videos ?? []) as MediaVideo[],
-            ratings: (ratings ?? []) as MediaRating[],
+            videos: (videos ?? []),
+            ratings: (ratings ?? []),
             watch_providers: (providers ?? []).map((p: any) => ({
                 id: p.id,
                 media_id: p.media_id,
@@ -250,7 +250,7 @@ export const MediaService = {
                 platform: p.platform?.[0],
             })),
             faqs: faqs ?? [],
-        } as MediaDetail
+        }
     },
 
     /**
@@ -319,7 +319,7 @@ export const MediaService = {
             .single()
 
         if (error) throw error
-        return data as { id: string; slug: string }
+        return data
     },
 
     /**
@@ -338,7 +338,7 @@ export const MediaService = {
         // 2. Borrar relaciones actuales
         await supabase.from('media_genres').delete().eq('media_id', mediaId)
 
-        if (!genres || !genres.length) return
+        if (!genres?.length) return
 
         // 3. Insertar las nuevas relaciones
         const { error } = await supabase

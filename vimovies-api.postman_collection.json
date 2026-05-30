@@ -1,0 +1,2880 @@
+{
+	"info": {
+		"_postman_id": "vimovies-api-collection",
+		"name": "Vimovies API - Complete Collection",
+		"description": "Complete API collection for Vimovies - Movies and Series SEO Platform. This collection includes all endpoints for media management, authentication, admin operations, and SEO rendering.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "vimovies-export"
+	},
+	"item": [
+		{
+			"name": "🔐 Authentication",
+			"description": "Authentication endpoints for admin access and token management",
+			"item": [
+				{
+					"name": "Admin Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Store token for authenticated requests",
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('auth_token', response.data.token);",
+									"    pm.collectionVariables.set('refresh_token', response.data.refreshToken);",
+									"    pm.collectionVariables.set('user_role', response.data.user.role);",
+									"    console.log('Token stored successfully');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@vimovies.com\",\n    \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/admin/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"admin",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Token",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/verify",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"verify"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refreshToken\": \"{{refresh_token}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/refresh",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/logout",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "📽️ Media (Movies & Series)",
+			"description": "Public and admin endpoints for movies and series management",
+			"item": [
+				{
+					"name": "📖 Public Endpoints",
+					"item": [
+						{
+							"name": "List Media",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/media?page=1&limit=20&media_type=movie",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"media"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "20"
+										},
+										{
+											"key": "media_type",
+											"value": "movie",
+											"description": "Filter by media_type: movie, series, tv"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search Media",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/media/search?q=batman&media_type=movie&page=1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"media",
+										"search"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "batman"
+										},
+										{
+											"key": "media_type",
+											"value": "movie",
+											"description": "Filter by media_type: movie, series, tv"
+										},
+										{
+											"key": "page",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Media by Genre",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/media/genre/accion?page=1&limit=20",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"media",
+										"genre",
+										"accion"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "20"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Media by Slug",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/media/inception",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"media",
+										"inception"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "🔧 Admin Endpoints",
+					"item": [
+						{
+							"name": "Admin List Media",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/media/admin?page=1&limit=20",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"media",
+										"admin"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "20"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Admin Get Media by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/media/admin/123",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"media",
+										"admin",
+										"123"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Editorial Content",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"editorial_rating\": 8.5,\n    \"editorial_review_es\": \"Una película excepcional que redefine el género de ciencia ficción...\",\n    \"editorial_review_en\": \"An exceptional film that redefines the science fiction genre...\",\n    \"verdict\": \"must_watch\",\n    \"seo_title_es\": \"Inception (2010) - Película Completa | Vimovies\",\n    \"seo_description_es\": \"Descubre Inception, la película de Christopher Nolan. Trama, reparto, dónde ver y más.\",\n    \"status\": \"published\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/media/admin/123",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"media",
+										"admin",
+										"123"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Patch Media (Partial Update)",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"status\": \"published\",\n    \"noindex\": false,\n    \"sitemap_priority\": \"high\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/media/admin/123/patch",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"media",
+										"admin",
+										"123",
+										"patch"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Media",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/media/admin/123",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"media",
+										"admin",
+										"123"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Sync Genres",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"genre_ids\": [28, 878, 53]\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/media/admin/123/genres",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"media",
+										"admin",
+										"123",
+										"genres"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Sync Videos",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/media/admin/123/videos",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"media",
+										"admin",
+										"123",
+										"videos"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "🎬 Media Videos Management",
+					"item": [
+						{
+							"name": "Get Videos List",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/media/admin/123/videos/list",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"media",
+										"admin",
+										"123",
+										"videos",
+										"list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add Single Video",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"key\": \"official_trailer_2\",\n    \"name\": \"Official Trailer 2\",\n    \"site\": \"YouTube\",\n    \"size\": 1080,\n    \"type\": \"Trailer\",\n    \"official\": true,\n    \"published_at\": \"2024-01-15T10:00:00Z\",\n    \"id\": \"dQw4w9WgXcQ\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/media/admin/123/videos/single",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"media",
+										"admin",
+										"123",
+										"videos",
+										"single"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Video",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Updated Official Trailer\",\n    \"official\": false\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/media/admin/123/videos/456",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"media",
+										"admin",
+										"123",
+										"videos",
+										"456"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Remove Video",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/media/admin/123/videos/456",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"media",
+										"admin",
+										"123",
+										"videos",
+										"456"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "🎭 Media Credits Management",
+					"item": [
+						{
+							"name": "Get Credits",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/media/admin/123/credits",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"media",
+										"admin",
+										"123",
+										"credits"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add Credit",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"person_id\": 789,\n    \"role\": \"Cast\",\n    \"character_name\": \"Dom Cobb\",\n    \"order\": 1,\n    \"is_main_cast\": true\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/media/admin/123/credits",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"media",
+										"admin",
+										"123",
+										"credits"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Credit Order",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"order\": 2\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/media/admin/123/credits/456/order",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"media",
+										"admin",
+										"123",
+										"credits",
+										"456",
+										"order"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Remove Credit",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/media/admin/123/credits/456",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"media",
+										"admin",
+										"123",
+										"credits",
+										"456"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "📺 Media Watch Providers Management",
+					"item": [
+						{
+							"name": "Get Providers",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/media/admin/123/providers",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"media",
+										"admin",
+										"123",
+										"providers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add Provider",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"platform_id\": 8,\n    \"region\": \"US\",\n    \"provider_type\": \"flatrate\",\n    \"display_priority\": 1\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/media/admin/123/providers",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"media",
+										"admin",
+										"123",
+										"providers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Provider",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"display_priority\": 2,\n    \"provider_type\": \"buy\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/media/admin/123/providers/456",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"media",
+										"admin",
+										"123",
+										"providers",
+										"456"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Remove Provider",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/media/admin/123/providers/456",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"media",
+										"admin",
+										"123",
+										"providers",
+										"456"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "🎭 Genres",
+			"description": "Endpoints for genre management and content organization",
+			"item": [
+				{
+					"name": "📖 Public Endpoints",
+					"item": [
+						{
+							"name": "List All Genres",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/genres",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"genres"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Genre with Media",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/genres/accion/media?page=1&limit=20",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"genres",
+										"accion",
+										"media"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "20"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Genre by Slug",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/genres/accion",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"genres",
+										"accion"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "🔧 Admin Endpoints",
+					"item": [
+						{
+							"name": "Create Genre",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"tmdb_id\": 28,\n    \"name_es\": \"Acción\",\n    \"name_en\": \"Action\",\n    \"slug\": \"accion\",\n    \"description_es\": \"Películas llenas de adrenalina y escenas emocionantes\",\n    \"description_en\": \"Movies full of adrenaline and exciting scenes\",\n    \"seo_title_es\": \"Películas de Acción - Las Mejores | Vimovies\",\n    \"seo_description_es\": \"Descubre las mejores películas de acción. Explosiones, persecuciones y héroes increíbles.\",\n    \"status\": \"published\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/genres/admin",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"genres",
+										"admin"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Genre",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"description_es\": \"Películas llenas de adrenalina, persecuciones y escenas de acción emocionantes\",\n    \"seo_title_es\": \"Películas de Acción Online - Las Mejores Películas | Vimovies\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/genres/admin/28",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"genres",
+										"admin",
+										"28"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Genre",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/genres/admin/28",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"genres",
+										"admin",
+										"28"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "👥 People (Actors & Directors)",
+			"description": "Endpoints for people management including actors, directors, and crew",
+			"item": [
+				{
+					"name": "📖 Public Endpoints",
+					"item": [
+						{
+							"name": "Search People",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/people/search?q=leonardo+dicaprio&page=1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"people",
+										"search"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "leonardo dicaprio"
+										},
+										{
+											"key": "page",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Person by Slug",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/people/leonardo-dicaprio",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"people",
+										"leonardo-dicaprio"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "🔧 Admin Endpoints",
+					"item": [
+						{
+							"name": "Admin List People",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/people/admin?page=1&limit=20",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"people",
+										"admin"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "20"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Admin Get Person by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/people/admin/6193",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"people",
+										"admin",
+										"6193"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Person",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"biography_es\": \"Leonardo Wilhelm DiCaprio es un actor y productor estadounidense...\",\n    \"biography_en\": \"Leonardo Wilhelm DiCaprio is an American actor and film producer...\",\n    \"seo_title_es\": \"Leonardo DiCaprio - Biografía y Filmografía | Vimovies\",\n    \"seo_description_es\": \"Conoce todo sobre Leonardo DiCaprio: sus películas, premios y biografía completa.\",\n    \"status\": \"published\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/people/admin/6193",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"people",
+										"admin",
+										"6193"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Person",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/people/admin/6193",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"people",
+										"admin",
+										"6193"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "📺 Platforms (Streaming)",
+			"description": "Endpoints for streaming platforms management and content availability",
+			"item": [
+				{
+					"name": "📖 Public Endpoints",
+					"item": [
+						{
+							"name": "List All Platforms",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/platforms",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"platforms"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Platform by Slug",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/platforms/netflix",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"platforms",
+										"netflix"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "🔧 Admin Endpoints",
+					"item": [
+						{
+							"name": "Admin List Platforms",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/platforms/admin",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"platforms",
+										"admin"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Platform",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"tmdb_id\": 8,\n    \"name\": \"Netflix\",\n    \"slug\": \"netflix\",\n    \"logo_url\": \"/logos/netflix.svg\",\n    \"description_es\": \"Plataforma de streaming con miles de películas y series\",\n    \"description_en\": \"Streaming platform with thousands of movies and series\",\n    \"affiliate_url_es\": \"https://www.netflix.com/\",\n    \"affiliate_url_en\": \"https://www.netflix.com/\",\n    \"display_order\": 1,\n    \"status\": \"published\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/platforms/admin",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"platforms",
+										"admin"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Platform",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"description_es\": \"La plataforma de streaming más grande del mundo con contenido original\",\n    \"affiliate_url_es\": \"https://netflix.com/offer?track=vimovies\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/platforms/admin/8",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"platforms",
+										"admin",
+										"8"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Platform",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/platforms/admin/8",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"platforms",
+										"admin",
+										"8"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Sync Providers for Media",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/platforms/admin/media/123/providers/sync",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"platforms",
+										"admin",
+										"media",
+										"123",
+										"providers",
+										"sync"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Affiliate Links",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"affiliate_url_es\": \"https://netflix.com/offer?track=vimovies2024\",\n    \"affiliate_url_en\": \"https://netflix.com/offer?track=vimovies2024_en\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/platforms/admin/providers/8/affiliate",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"platforms",
+										"admin",
+										"providers",
+										"8",
+										"affiliate"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "📝 Articles (SEO Content)",
+			"description": "Endpoints for SEO articles, blog posts, and content management",
+			"item": [
+				{
+					"name": "📖 Public Endpoints",
+					"item": [
+						{
+							"name": "List Articles",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/articles?page=1&limit=20&status=published",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"articles"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "20"
+										},
+										{
+											"key": "status",
+											"value": "published"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Article by Slug",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/articles/mejores-peliculas-accion-2024",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"articles",
+										"mejores-peliculas-accion-2024"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "🔧 Admin Endpoints",
+					"item": [
+						{
+							"name": "Admin List Articles",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/articles/admin?page=1&limit=20",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"articles",
+										"admin"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "20"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Admin Get Article by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/articles/admin/123",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"articles",
+										"admin",
+										"123"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Article",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title_es\": \"Las Mejores Películas de Acción de 2024\",\n    \"title_en\": \"Best Action Movies of 2024\",\n    \"slug\": \"mejores-peliculas-accion-2024\",\n    \"excerpt_es\": \"Descubre las películas de acción más emocionantes de este año\",\n    \"excerpt_en\": \"Discover the most exciting action movies of this year\",\n    \"content_es\": \"<h2>Introducción</h2><p>2024 nos ha traído increíbles películas de acción...</p>\",\n    \"content_en\": \"<h2>Introduction</h2><p>2024 has brought us incredible action movies...</p>\",\n    \"seo_title_es\": \"Mejores Películas de Acción 2024 - Top 10 | Vimovies\",\n    \"seo_description_es\": \"Las 10 mejores películas de acción de 2024. Explosiones, héroes y adrenalina pura.\",\n    \"featured_image_url\": \"/images/articles/action-movies-2024.jpg\",\n    \"status\": \"draft\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/articles/admin",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"articles",
+										"admin"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Article",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"content_es\": \"<h2>Introducción</h2><p>2024 nos ha traído increíbles películas de acción con efectos especiales impresionantes...</p>\",\n    \"featured_image_url\": \"/images/articles/action-movies-2024-updated.jpg\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/articles/admin/123",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"articles",
+										"admin",
+										"123"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Publish Article",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/articles/admin/123/publish",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"articles",
+										"admin",
+										"123",
+										"publish"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Archive Article",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/articles/admin/123/archive",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"articles",
+										"admin",
+										"123",
+										"archive"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Article",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/articles/admin/123",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"articles",
+										"admin",
+										"123"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create FAQ",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"question_es\": \"¿Cuál es la mejor película de acción de 2024?\",\n    \"question_en\": \"What is the best action movie of 2024?\",\n    \"answer_es\": \"Según nuestra opinión, la mejor película de acción de 2024 es...\",\n    \"answer_en\": \"In our opinion, the best action movie of 2024 is...\",\n    \"order\": 1\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/articles/admin/123/faqs",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"articles",
+										"admin",
+										"123",
+										"faqs"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update FAQ",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"answer_es\": \"Según nuestra opinión y la de los críticos, la mejor película de acción de 2024 es...\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/articles/admin/faqs/456",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"articles",
+										"admin",
+										"faqs",
+										"456"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete FAQ",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/articles/admin/faqs/456",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"articles",
+										"admin",
+										"faqs",
+										"456"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Sync Mentions",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"media_mentions\": [\n        {\"media_id\": 123, \"mention_type\": \"featured\"},\n        {\"media_id\": 124, \"mention_type\": \"mentioned\"}\n    ]\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/articles/admin/123/mentions",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"articles",
+										"admin",
+										"123",
+										"mentions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Sync Tags",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"tags\": [\"accion\", \"2024\", \"mejores-peliculas\", \"top10\"]\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/articles/admin/123/tags",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"articles",
+										"admin",
+										"123",
+										"tags"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Tags",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/articles/admin/tags",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"articles",
+										"admin",
+										"tags"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Seed Tags",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/articles/admin/tags/seed",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"articles",
+										"admin",
+										"tags",
+										"seed"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "📋 Curated Lists (Rankings)",
+			"description": "Endpoints for curated lists, rankings, and collections management",
+			"item": [
+				{
+					"name": "📖 Public Endpoints",
+					"item": [
+						{
+							"name": "List All Curated Lists",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/lists?page=1&limit=20",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"lists"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "20"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get List by Slug",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/lists/mejores-peliculas-netflix",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"lists",
+										"mejores-peliculas-netflix"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "🔧 Admin Endpoints",
+					"item": [
+						{
+							"name": "Create Curated List",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title_es\": \"Las Mejores Películas en Netflix\",\n    \"title_en\": \"Best Movies on Netflix\",\n    \"slug\": \"mejores-peliculas-netflix\",\n    \"description_es\": \"Las películas más recomendadas que puedes ver ahora mismo en Netflix\",\n    \"description_en\": \"The most recommended movies you can watch right now on Netflix\",\n    \"seo_title_es\": \"Mejores Películas Netflix - Guía Completa 2024 | Vimovies\",\n    \"seo_description_es\": \"Descubre las mejores películas disponibles en Netflix. Actualizado mensualmente.\",\n    \"cover_image_url\": \"/images/lists/netflix-movies.jpg\",\n    \"is_featured\": true,\n    \"list_type\": \"ranking\",\n    \"status\": \"published\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/lists/admin",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"lists",
+										"admin"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Curated List",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"description_es\": \"Las películas más recomendadas que puedes ver ahora mismo en Netflix (actualizado mensualmente)\",\n    \"is_featured\": false\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/lists/admin/123",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"lists",
+										"admin",
+										"123"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Curated List",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/lists/admin/123",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"lists",
+										"admin",
+										"123"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Sync List Items",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"items\": [\n        {\"media_id\": 123, \"order\": 1, \"description\": \"La película más aclamada del año\"},\n        {\"media_id\": 124, \"order\": 2, \"description\": \"Un thriller increíble\"},\n        {\"media_id\": 125, \"order\": 3, \"description\": \"Comedia familiar perfecta\"}\n    ]\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/lists/admin/123/items",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"lists",
+										"admin",
+										"123",
+										"items"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add Item to List",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"media_id\": 126,\n    \"order\": 4,\n    \"description\": \"Aventura épica que no te puedes perder\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/lists/admin/123/items",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"lists",
+										"admin",
+										"123",
+										"items"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Remove Item from List",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/lists/admin/123/items/126",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"lists",
+										"admin",
+										"123",
+										"items",
+										"126"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "🎯 SEO & Rendering",
+			"description": "SEO rendering endpoints for bots and crawlers",
+			"item": [
+				{
+					"name": "Render Movie Page (Spanish)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "User-Agent",
+								"value": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/render/pelicula/inception?region=ES",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"render",
+								"pelicula",
+								"inception"
+							],
+							"query": [
+								{
+									"key": "region",
+									"value": "ES"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Render Movie Page (English)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "User-Agent",
+								"value": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/render/movie/inception?region=US",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"render",
+								"movie",
+								"inception"
+							],
+							"query": [
+								{
+									"key": "region",
+									"value": "US"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Render Series Page (Spanish)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "User-Agent",
+								"value": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/render/serie/stranger-things?region=ES",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"render",
+								"serie",
+								"stranger-things"
+							],
+							"query": [
+								{
+									"key": "region",
+									"value": "ES"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Render Series Page (English)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "User-Agent",
+								"value": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/render/tv-show/stranger-things?region=US",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"render",
+								"tv-show",
+								"stranger-things"
+							],
+							"query": [
+								{
+									"key": "region",
+									"value": "US"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Render Article Page",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "User-Agent",
+								"value": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/render/articulo/mejores-peliculas-accion-2024",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"render",
+								"articulo",
+								"mejores-peliculas-accion-2024"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Render Genre Page",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "User-Agent",
+								"value": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/render/genero/accion",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"render",
+								"genero",
+								"accion"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Render Ranking Page",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "User-Agent",
+								"value": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/render/ranking/mejores-peliculas-netflix",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"render",
+								"ranking",
+								"mejores-peliculas-netflix"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "📊 Dashboard & Analytics",
+			"description": "Dashboard endpoints for statistics and analytics",
+			"item": [
+				{
+					"name": "Get Dashboard Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/dashboard/stats",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"dashboard",
+								"stats"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🔄 Sync Operations",
+			"description": "Endpoints for TMDB synchronization and data import",
+			"item": [
+				{
+					"name": "Start Movies Sync",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"movieCount\": 50,\n    \"searchStrategy\": \"multiple_searches\",\n    \"minVoteAverage\": 6.0,\n    \"minVoteCount\": 100,\n    \"includeAdult\": false,\n    \"originalLanguage\": \"en\",\n    \"releaseYearStart\": 2020,\n    \"releaseYearEnd\": 2024,\n    \"requireSpanishVersion\": true,\n    \"requireEnglishVersion\": true,\n    \"maxCast\": 15,\n    \"maxCrew\": 10,\n    \"syncVideos\": true,\n    \"syncWatchProviders\": true,\n    \"providerRegions\": [\"ES\", \"MX\", \"AR\", \"CO\", \"US\"],\n    \"updateExisting\": true,\n    \"preserveEditorial\": true,\n    \"defaultStatus\": \"draft\",\n    \"delayBetweenMovies\": 500\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/sync/movies/start",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"sync",
+								"movies",
+								"start"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Sync Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/sync/movies/job_123/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"sync",
+								"movies",
+								"job_123",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Pause Sync Job",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/sync/movies/job_123/pause",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"sync",
+								"movies",
+								"job_123",
+								"pause"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Resume Sync Job",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+										"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/sync/movies/job_123/resume",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"sync",
+								"movies",
+								"job_123",
+								"resume"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Stop Sync Job",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/sync/movies/job_123/stop",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"sync",
+								"movies",
+								"job_123",
+								"stop"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Active Sync Jobs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/sync/movies/active",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"sync",
+								"movies",
+								"active"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Sync Config",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/sync/movies/config",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"sync",
+								"movies",
+								"config"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cleanup Completed Jobs",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/sync/movies/cleanup",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"sync",
+								"movies",
+								"cleanup"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🗺️ Sitemaps & SEO",
+			"description": "Sitemap generation and SEO endpoints",
+			"item": [
+				{
+					"name": "Sitemap Index",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/sitemap.xml",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"sitemap.xml"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Movies Sitemap (Spanish)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/sitemap-peliculas.xml",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"sitemap-peliculas.xml"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Movies Sitemap (English)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/sitemap-peliculas-en.xml",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"sitemap-peliculas-en.xml"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Series Sitemap",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/sitemap-series.xml",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"sitemap-series.xml"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Genres Sitemap",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/sitemap-generos.xml",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"sitemap-generos.xml"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Articles Sitemap",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/sitemap-articulos.xml",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"sitemap-articulos.xml"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Robots.txt",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/robots.txt",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"robots.txt"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🐛 Debug & Testing",
+			"description": "Debug endpoints for development and testing",
+			"item": [
+				{
+					"name": "Debug Media List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/debug/media",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"debug",
+								"media"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Debug Media by Slug",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/debug/media/inception",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"debug",
+								"media",
+								"inception"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "💚 Health Check",
+			"description": "System health and status endpoints",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/health",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Auto-refresh token if expired",
+					"if (pm.collectionVariables.get('auth_token') && pm.request.headers.has('Authorization')) {",
+					"    const token = pm.collectionVariables.get('auth_token');",
+					"    try {",
+					"        const payload = JSON.parse(atob(token.split('.')[1]));",
+					"        const now = Math.floor(Date.now() / 1000);",
+					"        if (payload.exp < now) {",
+					"            console.log('Token expired, attempting refresh...');",
+					"            // Token refresh logic would go here",
+					"        }",
+					"    } catch (e) {",
+					"        console.log('Invalid token format');",
+					"    }",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string",
+			"description": "API base URL - change to your production URL when deployed"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string",
+			"description": "JWT authentication token - automatically set after login"
+		},
+		{
+			"key": "refresh_token",
+			"value": "",
+			"type": "string",
+			"description": "JWT refresh token - automatically set after login"
+		},
+		{
+			"key": "user_role",
+			"value": "",
+			"type": "string",
+			"description": "User role - automatically set after login"
+		}
+	]
+}

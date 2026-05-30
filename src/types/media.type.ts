@@ -1,7 +1,8 @@
-import { ContentStatus, SitemapPriority, MediaType, PersonRole, PlatformType, SupportedLocale, RatingSource, VideoType, VideoSite } from "@/enums";
+import type { ArticleFAQ } from "./articleFaQ.type";
 import type { Genre } from "./genres.type";
 import type { Person } from "./person.type";
-import type { ArticleFAQ } from "./articleFaQ.type";
+
+import { ContentStatus, SitemapPriority, MediaType, PersonRole, PlatformType, SupportedLocale, RatingSource, VideoType, VideoSite } from "@/enums";
 
 export interface MediaFilters {
     page?: number

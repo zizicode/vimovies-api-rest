@@ -1,6 +1,7 @@
+import { Hono } from "hono"
+
 import { CuratedListsController } from "@/controllers/curated-list.controller"
 import { createAuthMiddleware } from "@/utils"
-import { Hono } from "hono"
 
 export const curatedListsRoutes = new Hono()
 

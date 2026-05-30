@@ -1,4 +1,5 @@
 import { Hono } from "hono"
+
 import { PeopleController } from "@/controllers/person.controller"
 import { createAuthMiddleware } from "@/utils"
 

@@ -1,5 +1,6 @@
-import { ContentStatus, SitemapPriority } from "@/enums";
 import { Media } from "./media.type";
+
+import { ContentStatus, SitemapPriority } from "@/enums";
 
 export type CuratedListType = 'ranking' | 'collection' | 'seasonal' | 'thematic';
   

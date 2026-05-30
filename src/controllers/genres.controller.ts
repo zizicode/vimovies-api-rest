@@ -1,6 +1,7 @@
+import { Context } from "hono"
+
 import { GenreService } from "@/services/genres.service"
 import { notFound, ok, paginated, serverError } from "@/utils"
-import { Context } from "hono"
 
 export const GenresController = {
 
@@ -33,7 +34,7 @@ export const GenresController = {
   async getWithMedia(c: Context) {
     try {
       const { slug } = c.req.param()
-      if (!slug) return notFound(c, 'G�nero')
+      if (!slug) return notFound(c, 'Genero')
       const limit    = Number(c.req.query('limit') ?? 20)
       const result   = await GenreService.findBySlugWithMedia(slug, limit)
       if (!result) return notFound(c, 'Género')

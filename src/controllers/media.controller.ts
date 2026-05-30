@@ -1,7 +1,8 @@
+import type { Context } from 'hono'
+
 import { ContentStatus, MediaType } from '@/enums'
 import { MediaService } from '@/services/media.service'
 import { notFound, ok, paginated, serverError } from '@/utils'
-import type { Context } from 'hono'
 
 export const MediaController = {
     // Get /media
@@ -12,9 +13,14 @@ export const MediaController = {
             const media_type = c.req.query('media_type') as MediaType | undefined
             const sort_by = (c.req.query('sort_by') as 'tmdb_popularity' | 'release_date' | 'editorial_rating' | undefined) ?? 'tmdb_popularity'
             const sort_order = (c.req.query('sort_order') as 'asc' | 'desc' | undefined) ?? 'desc'
-            const status = c.req.query('status') as ContentStatus | undefined ?? 'published'
+            const status = c.req.query('status') as ContentStatus | undefined
+            const genre_id = c.req.query('genre_id') ? Number(c.req.query('genre_id')) : undefined
+            const search = c.req.query('search')
 
-            const filters: any = { page, per_page, sort_by, sort_order, status }
+            const filters: any = { page, per_page, sort_by, sort_order }
+            if (status) filters.status = status
+            if (genre_id) filters.genre_id = genre_id
+            if (search) filters.search = search
             if (media_type) filters.media_type = media_type
 
             const { data, total } = await MediaService.findAll(filters)
@@ -29,7 +35,7 @@ export const MediaController = {
         try {
             const { slug } = c.req.param()
             if (!slug) return notFound(c, 'Película/Serie')
-            const region = (c.req.query('region') as string | undefined) ?? 'ES'
+            const region = (c.req.query('region')) ?? 'ES'
             const media = await MediaService.findBySlugFull(slug, region)
             if (!media) return notFound(c, 'Película/Serie')
             return ok(c, media)
@@ -75,11 +81,11 @@ export const MediaController = {
             const noindex = c.req.query('noindex') !== undefined
                 ? c.req.query('noindex') === 'true'
                 : undefined
-            const search = c.req.query('search') as string | undefined
+            const search = c.req.query('search')
             const genre_id = c.req.query('genre_id') ? Number(c.req.query('genre_id')) : undefined
-            const media_type = c.req.query('media_type') as string | undefined
-            const sort_by = c.req.query('sort_by') as string | undefined
-            const sort_order = c.req.query('sort_order') as string | undefined
+            const media_type = c.req.query('media_type')
+            const sort_by = c.req.query('sort_by')
+            const sort_order = c.req.query('sort_order')
 
             const filters: any = { page, per_page }
             if (status !== undefined) filters.status = status

@@ -1,6 +1,7 @@
+import { Context } from "hono"
+
 import { CuratedListsService } from "@/services/curated-list.service"
 import { notFound, ok, paginated, serverError } from "@/utils"
-import { Context } from "hono"
 
 export const CuratedListsController = {
 

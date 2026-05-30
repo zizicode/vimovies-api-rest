@@ -1,6 +1,7 @@
+import { Context } from "hono"
+
 import { MediaWatchProvidersService } from "@/services/media-watch-providers.service"
 import { notFound, ok, serverError } from "@/utils"
-import { Context } from "hono"
 
 export const MediaWatchProvidersController = {
   /**

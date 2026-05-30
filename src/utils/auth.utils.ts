@@ -1,8 +1,8 @@
 // utils/auth.ts
 
+import * as bcrypt from 'bcryptjs'
 import { Context, Next } from 'hono'
 import { SignJWT, jwtVerify } from 'jose'
-import * as bcrypt from 'bcryptjs'
 
 // ── Roles ────────────────────────────────────────────────────
 
@@ -24,19 +24,19 @@ export const HARDCODED_USERS: HardcodedUser[] = [
     id      : 'usr_001',
     name    : 'Super Admin',
     role    : 'super_admin',
-    password: '$2b$12$jXl6PQJXMMiry1Wq9ghayuG1KkJutwTLAeI3Ngl9nLuKIMMxIczI2',
+    password: '$2b$12$fo7VoJHy7ZzITzbzP8NvvOan.SJRWnQo7NfBoeGSMRUDT53PYCfRm',
   },
   {
     id      : 'usr_002',
     name    : 'Admin One',
     role    : 'admin',
-    password: '$2b$12$gn7XjBMceDvxjUNSxKXG..6JMq5o1bed2PwuldmgqPiY4tBnl82ia',
+    password: '$2b$12$yrfDP5auVOMRPwTyyrVVMO6rKEtUuSt9DoCEMogEQBYC//jYAp6ay',
   },
   {
     id      : 'usr_003',
     name    : 'Admin Two',
     role    : 'admin',
-    password: '$2b$12$It6oODIoGeF76j871XsvNuJJ1T50ztUKmjO9s1TRgl.jbgY6FczKO',
+    password: '$2b$12$4PdftXmz3/zH7smsrvGf6ubXPGh.58pqUvkmPPbgfsrGRCu/9j4M.',
   },
 ]
 
@@ -112,5 +112,5 @@ export const createAuthMiddleware = (requiredRole: Role = 'admin') =>
       return c.json({ success: false, error: 'Forbidden' }, 403)
 
     c.set('user', payload)
-    await next()
+    return await next()
   }

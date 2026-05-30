@@ -1,9 +1,10 @@
-import { MediaController } from '@/controllers/media.controller'
-import { MediaVideosController } from '@/controllers/media-videos.controller'
-import { createAuthMiddleware } from '@/utils/auth.utils'
 import { Hono } from 'hono'
+
 import { MediaCreditsController } from '@/controllers/media-credits.controller'
+import { MediaVideosController } from '@/controllers/media-videos.controller'
 import { MediaWatchProvidersController } from '@/controllers/media-watch-providers.controller'
+import { MediaController } from '@/controllers/media.controller'
+import { createAuthMiddleware } from '@/utils/auth.utils'
 export const mediaRoutes = new Hono()
 
 // ── Admin Routes ───────────────────────────────────────────────────────────

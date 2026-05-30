@@ -114,7 +114,7 @@ export const PersonService = {
             .single()
 
         if (error) throw error
-        return data as { id: string }
+        return data
     },
 
     /**

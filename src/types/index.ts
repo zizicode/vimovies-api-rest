@@ -5,4 +5,6 @@ export * from './articleFaQ.type'
 export * from './plataform.type'
 export * from './articles.type'
 export * from './curated-list.type'
+export * from './request.type'
+export * from './hono.type'
 
