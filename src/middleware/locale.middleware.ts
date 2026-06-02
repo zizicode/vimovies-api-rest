@@ -111,8 +111,9 @@ export const localeMiddleware: MiddlewareHandler = async (c: Context, next: Next
     source = 'accept-language'
   }
   
-  // 4. Para bots, priorizar User-Agent sobre Accept-Language
-  if (userAgent.includes('bot')) {
+  // 4. Para bots, respetar Accept-Language (Googlebot envía el idioma correcto)
+  // Solo usar User-Agent como fallback si Accept-Language no está disponible
+  if (userAgent.includes('bot') && !acceptLanguage) {
     const uaLocale = detectFromUserAgent(userAgent)
     if (uaLocale !== DEFAULT_LOCALE) {
       detectedLocale = uaLocale

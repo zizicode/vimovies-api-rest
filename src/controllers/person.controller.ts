@@ -50,7 +50,7 @@ export const PeopleController = {
       const { id } = c.req.param() 
       const person = await PersonService.findById(id ?? '')
       if (!person) return notFound(c, 'Persona')
-      return ok(c, person)
+      return ok(c, person, 200, 'long')
     } catch (err) {
       console.error('Error en PeopleController.adminGetById:', err)
       return serverError(c, err)
@@ -69,7 +69,7 @@ export const PeopleController = {
       let body
       try {
         body = await c.req.json()
-      } catch (jsonError) {
+      } catch {
         return serverError(c, new Error('JSON inválido en el cuerpo de la solicitud'))
       }
 
@@ -79,7 +79,7 @@ export const PeopleController = {
 
       const person = await PersonService.update(id, body)
       if (!person) return notFound(c, 'Persona')
-      return ok(c, person)
+      return ok(c, person, 200, 'long')
     } catch (err) {
       console.error('Error en PeopleController.update:', err)
       return serverError(c, err)

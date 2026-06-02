@@ -5,6 +5,7 @@ import { ArticlesService } from '../services/articles.service'
 import { CuratedListsService } from '../services/curated-list.service'
 import { GenreService } from '../services/genres.service'
 import { MediaService } from '../services/media.service'
+import { htmlWithCache } from '../utils/response'
 import '../types/hono.type'
 
 const routes = new Hono()
@@ -50,13 +51,13 @@ const movieSchema = (media: any, locale: SupportedLocale = DEFAULT_LOCALE) => {
     contentRating: media.editorial_rating ? `${media.editorial_rating}/10` : '',
     duration: media.runtime_minutes ? `PT${media.runtime_minutes}M` : '',
     genre: media.genres?.map((g: any) => isEs ? g.name_es : g.name_en).filter(Boolean) || [],
-    actor: media.credits?.filter((c: any) => c.role === 'Cast').slice(0, 5).map((c: any) => ({
+    actor: media.credits?.filter((c: any) => c.role === 'actor' && c.cast_order).slice(0, 5).map((c: any) => ({
       '@type': 'Person',
-      name: c.name
+      name: c.person?.name || c.character_name
     })) || [],
-    director: media.credits?.filter((c: any) => c.role === 'Director').slice(0, 3).map((c: any) => ({
+    director: media.credits?.filter((c: any) => c.role === 'director').slice(0, 3).map((c: any) => ({
       '@type': 'Person',
-      name: c.name
+      name: c.person?.name
     })) || []
   }
 }
@@ -73,13 +74,13 @@ const tvSeriesSchema = (media: any, locale: SupportedLocale = DEFAULT_LOCALE) =>
     url: `https://vimovies.com/${isEs ? 'serie' : 'tv-show'}/${media.slug}`,
     contentRating: media.editorial_rating ? `${media.editorial_rating}/10` : '',
     genre: media.genres?.map((g: any) => isEs ? g.name_es : g.name_en).filter(Boolean) || [],
-    actor: media.credits?.filter((c: any) => c.role === 'Cast').slice(0, 5).map((c: any) => ({
+    actor: media.credits?.filter((c: any) => c.role === 'actor' && c.cast_order).slice(0, 5).map((c: any) => ({
       '@type': 'Person',
-      name: c.name
+      name: c.person?.name || c.character_name
     })) || [],
-    director: media.credits?.filter((c: any) => c.role === 'Director').slice(0, 3).map((c: any) => ({
+    director: media.credits?.filter((c: any) => c.role === 'director').slice(0, 3).map((c: any) => ({
       '@type': 'Person',
-      name: c.name
+      name: c.person?.name
     })) || []
   }
 }
@@ -146,12 +147,12 @@ routes.get('/*', async (c) => {
     // Películas
     if (section === 'pelicula' && slug) {
       console.log(`[Render] Looking for movie with slug: ${slug}`)
-      const media = await MediaService.findBySlug(slug)
+      const media = await MediaService.findBySlugFull(slug)
       console.log(`[Render] Found media:`, media ? `${media.title_es || media.title_en} (type: ${media.media_type})` : 'null')
       
       if (media?.media_type !== 'movie') {
         console.log(`[Render] Movie not found or wrong type. media_type: ${media?.media_type}, expected: movie`)
-        return c.html(notFoundHtml(), 404)
+        return htmlWithCache(c, notFoundHtml(), 'none')
       }
 
       const isEs = locale === 'es'
@@ -171,18 +172,18 @@ routes.get('/*', async (c) => {
       const schema = movieSchema(media, locale)
       const body = `<main><article><h1>${title}</h1><p>${description}</p></article></main>`
 
-      return c.html(baseHtml(title, description, ogData, schema, body, locale))
+      return htmlWithCache(c, baseHtml(title, description, ogData, schema, body, locale), 'long')
     }
 
     // Series
     if (section === 'serie' && slug) {
       console.log(`[Render] Looking for series with slug: ${slug}`)
-      const media = await MediaService.findBySlug(slug)
+      const media = await MediaService.findBySlugFull(slug)
       console.log(`[Render] Found media:`, media ? `${media.title_es || media.title_en} (type: ${media.media_type})` : 'null')
       
       if (media?.media_type !== 'series') {
         console.log(`[Render] Series not found or wrong type. media_type: ${media?.media_type}, expected: series`)
-        return c.html(notFoundHtml(), 404)
+        return htmlWithCache(c, notFoundHtml(), 'none')
       }
 
       const title = media.seo_title_es || media.title_es || media.original_title
@@ -197,14 +198,14 @@ routes.get('/*', async (c) => {
       const schema = tvSeriesSchema(media)
       const body = `<main><article><h1>${title}</h1><p>${description}</p></article></main>`
 
-      return c.html(baseHtml(title, description, ogData, schema, body))
+      return htmlWithCache(c, baseHtml(title, description, ogData, schema, body), 'long')
     }
 
     // Artículos
     if (section === 'articulo' && slug) {
       const article = await ArticlesService.findBySlug(slug)
       if (!article) {
-        return c.html(notFoundHtml(), 404)
+        return htmlWithCache(c, notFoundHtml(), 'none')
       }
 
       const title = article.seo_title_es || article.title_es || article.title_en || 'Sin título'
@@ -219,14 +220,14 @@ routes.get('/*', async (c) => {
       const schema = articleSchema(article)
       const body = `<main><article><h1>${title}</h1><p>${description}</p></article></main>`
 
-      return c.html(baseHtml(title, description, ogData, schema, body))
+      return htmlWithCache(c, baseHtml(title, description, ogData, schema, body), 'long')
     }
 
     // Géneros
     if (section === 'genero' && slug) {
       const genre = await GenreService.findBySlug(slug)
       if (!genre) {
-        return c.html(notFoundHtml(), 404)
+        return htmlWithCache(c, notFoundHtml(), 'none')
       }
 
       const title = `${genre.name_es} - Películas y Series`
@@ -241,14 +242,14 @@ routes.get('/*', async (c) => {
       const schema = itemListSchema({ title, description, slug: genre.slug, items: [] })
       const body = `<main><section><h1>${genre.name_es}</h1><p>${description}</p></section></main>`
 
-      return c.html(baseHtml(title, description, ogData, schema, body))
+      return htmlWithCache(c, baseHtml(title, description, ogData, schema, body), 'long')
     }
 
     // Rankings
     if (section === 'ranking' && slug) {
       const list = await CuratedListsService.findBySlug(slug)
       if (!list) {
-        return c.html(notFoundHtml(), 404)
+        return htmlWithCache(c, notFoundHtml(), 'none')
       }
 
       const title = list.seo_title_es || list.title_es
@@ -263,14 +264,14 @@ routes.get('/*', async (c) => {
       const schema = itemListSchema(list)
       const body = `<main><section><h1>${title}</h1><p>${description}</p></section></main>`
 
-      return c.html(baseHtml(title, description, ogData, schema, body))
+      return htmlWithCache(c, baseHtml(title, description, ogData, schema, body), 'long')
     }
 
-    return c.html(notFoundHtml(), 404)
+    return htmlWithCache(c, notFoundHtml(), 'none')
 
   } catch (error) {
     console.error('[Render] Error:', error)
-    return c.html(notFoundHtml(), 500)
+    return htmlWithCache(c, notFoundHtml(), 'none')
   }
 })
 

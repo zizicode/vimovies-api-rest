@@ -19,7 +19,7 @@ export const ArticlesController = {
       if (intent) filters.intent = intent
 
       const { data, total } = await ArticlesService.findAll(filters)
-      return paginated(c, data, total, page, per_page)
+      return paginated(c, data, total, page, per_page, 'medium')
     } catch (err) {
       return serverError(c, err)
     }
@@ -32,7 +32,7 @@ export const ArticlesController = {
       if (!slug) return notFound(c, 'Artículo')
       const article   = await ArticlesService.findBySlug(slug)
       if (!article) return notFound(c, 'Artículo')
-      return ok(c, article)
+      return ok(c, article, 200, 'long')
     } catch (err) {
       return serverError(c, err)
     }
@@ -55,7 +55,7 @@ export const ArticlesController = {
       if (author_id) filters.author_id = author_id
 
       const { data, total } = await ArticlesService.findAll(filters)
-      return paginated(c, data, total, page, per_page)
+      return paginated(c, data, total, page, per_page, 'medium')
     } catch (err) {
       return serverError(c, err)
     }
@@ -68,7 +68,7 @@ export const ArticlesController = {
       if (!id) return notFound(c, 'Artículo')
       const article = await ArticlesService.findById(id)
       if (!article) return notFound(c, 'Artículo')
-      return ok(c, article)
+      return ok(c, article, 200, 'long')
     } catch (err) {
       return serverError(c, err)
     }
@@ -93,7 +93,7 @@ export const ArticlesController = {
       const body    = await c.req.json()
       const article = await ArticlesService.update(id, body)
       if (!article) return notFound(c, 'Artículo')
-      return ok(c, article)
+      return ok(c, article, 200, 'long')
     } catch (err) {
       return serverError(c, err)
     }
@@ -106,7 +106,7 @@ export const ArticlesController = {
       if (!id) return notFound(c, 'Artículo')
       const article = await ArticlesService.publish(id)
       if (!article) return notFound(c, 'Artículo')
-      return ok(c, article)
+      return ok(c, article, 200, 'long')
     } catch (err) {
       return serverError(c, err)
     }
@@ -119,7 +119,7 @@ export const ArticlesController = {
       if (!id) return notFound(c, 'Artículo')
       const article = await ArticlesService.archive(id)
       if (!article) return notFound(c, 'Artículo')
-      return ok(c, article)
+      return ok(c, article, 200, 'long')
     } catch (err) {
       return serverError(c, err)
     }
@@ -237,7 +237,7 @@ export const ArticlesController = {
         try {
           const created = await ArticlesService.createTag(tag);
           createdTags.push(created);
-        } catch (error) {
+        } catch {
           // Tag might already exist, continue
           console.log(`Tag ${tag.slug} might already exist`);
         }

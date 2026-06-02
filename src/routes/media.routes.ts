@@ -69,6 +69,7 @@ mediaRoutes.delete('/admin/:id/providers/:providerId', MediaWatchProvidersContro
 // // PATCH /admin/media/:id/providers/:providerId
 mediaRoutes.patch('/admin/:id/providers/:providerId', MediaWatchProvidersController.updateProvider)
 
+mediaRoutes.post('/admin/import', MediaController.importFromJson)
 // ── Public Routes ────────────────────────────────────────────────────────
 
 // GET /media

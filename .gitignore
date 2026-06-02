@@ -48,3 +48,5 @@ Thumbs.db
 .cache/
 .temp/
 .tmp/
+# Data exports
+data/

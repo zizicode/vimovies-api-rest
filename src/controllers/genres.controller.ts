@@ -11,7 +11,7 @@ export const GenresController = {
       const page     = Number(c.req.query('page')     ?? 1)
       const per_page = Number(c.req.query('per_page') ?? 50)
       const { data, total } = await GenreService.findAll({ page, per_page })
-      return paginated(c, data, total, page, per_page)
+      return paginated(c, data, total, page, per_page, 'medium')
     } catch (err) {
       return serverError(c, err)
     }
@@ -24,7 +24,7 @@ export const GenresController = {
       if (!slug) return notFound(c, 'Género')
       const genre = await GenreService.findBySlug(slug)
       if (!genre) return notFound(c, 'Género')
-      return ok(c, genre)
+      return ok(c, genre, 200, 'long')
     } catch (err) {
       return serverError(c, err)
     }
@@ -62,7 +62,7 @@ export const GenresController = {
       const body = await c.req.json()
       const genre = await GenreService.update(id, body)
       if (!genre) return notFound(c, 'Género')
-      return ok(c, genre)
+      return ok(c, genre, 200, 'long')
     } catch (err) {
       return serverError(c, err)
     }
@@ -79,3 +79,4 @@ export const GenresController = {
     }
   },
 }
+

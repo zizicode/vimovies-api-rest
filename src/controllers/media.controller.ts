@@ -1,6 +1,6 @@
 import type { Context } from 'hono'
 
-import { ContentStatus, MediaType } from '@/enums'
+import { ContentStatus, MediaType, SitemapPriority } from '@/enums'
 import { MediaService } from '@/services/media.service'
 import { notFound, ok, paginated, serverError } from '@/utils'
 
@@ -24,7 +24,7 @@ export const MediaController = {
             if (media_type) filters.media_type = media_type
 
             const { data, total } = await MediaService.findAll(filters)
-            return paginated(c, data, total, page, per_page)
+            return paginated(c, data, total, page, per_page, 'medium')
         } catch (err) {
             return serverError(c, err)
         }
@@ -38,7 +38,7 @@ export const MediaController = {
             const region = (c.req.query('region')) ?? 'ES'
             const media = await MediaService.findBySlugFull(slug, region)
             if (!media) return notFound(c, 'Película/Serie')
-            return ok(c, media)
+            return ok(c, media, 200, 'long')
         } catch (err) {
             return serverError(c, err)
         }
@@ -52,7 +52,7 @@ export const MediaController = {
             const page = Number(c.req.query('page') ?? 1)
             const per_page = Number(c.req.query('per_page') ?? 20)
             const { data, total } = await MediaService.findByGenre(genreSlug, page, per_page)
-            return paginated(c, data, total, page, per_page)
+            return paginated(c, data, total, page, per_page, 'medium')
         } catch (err) {
             return serverError(c, err)
         }
@@ -63,9 +63,9 @@ export const MediaController = {
         try {
             const q = c.req.query('q') ?? ''
             const limit = Number(c.req.query('limit') ?? 10)
-            if (!q.trim()) return ok(c, [])
+            if (!q.trim()) return ok(c, [], 200, 'short')
             const results = await MediaService.search(q, limit)
-            return ok(c, results)
+            return ok(c, results, 200, 'short')
         } catch (err) {
             return serverError(c, err)
         }
@@ -97,7 +97,7 @@ export const MediaController = {
             if (sort_order !== undefined) filters.sort_order = sort_order
 
             const { data, total } = await MediaService.findAll(filters)
-            return paginated(c, data, total, page, per_page)
+            return paginated(c, data, total, page, per_page, 'medium')
         } catch (err) {
             return serverError(c, err)
         }
@@ -110,7 +110,7 @@ export const MediaController = {
             if (!id) return notFound(c, 'Película/Serie')
             const media = await MediaService.findById(id)
             if (!media) return notFound(c, 'Película/Serie')
-            return ok(c, media)
+            return ok(c, media, 200, 'long')
         } catch (err) {
             return serverError(c, err)
         }
@@ -124,7 +124,7 @@ export const MediaController = {
             const body = await c.req.json()
             const media = await MediaService.updateEditorial(id, body)
             if (!media) return notFound(c, 'Película/Serie')
-            return ok(c, media)
+            return ok(c, media, 200, 'long')
         } catch (err) {
             return serverError(c, err)
         }
@@ -138,7 +138,7 @@ export const MediaController = {
             const body = await c.req.json()
             const media = await MediaService.patch(id, body)
             if (!media) return notFound(c, 'Película/Serie')
-            return ok(c, media)
+            return ok(c, media, 200, 'long')
         } catch (err) {
             return serverError(c, err)
         }
@@ -181,4 +181,69 @@ export const MediaController = {
             return serverError(c, err)
         }
     },
+
+    async importFromJson(c: Context) {
+    try {
+        const movie = await c.req.json()
+
+        const year = movie.release_date ? new Date(movie.release_date).getFullYear() : null
+        const slug = movie.original_title
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)/g, '')
+        const finalSlug = year ? `${slug}-${year}` : slug
+
+        const mediaData = {
+            tmdb_id: movie.tmdb_id,
+            imdb_id: movie.imdb_id || null,
+            media_type: MediaType.Movie,
+            slug: finalSlug,
+            original_title: movie.original_title,
+            original_language: movie.original_language,
+            release_date: movie.release_date || null,
+            runtime_minutes: movie.runtime_minutes || null,
+            tmdb_popularity: movie.tmdb_popularity || 0,
+            title_es: movie.title_es || null,
+            title_en: movie.title_en || null,
+            synopsis_es: movie.synopsis_es || null,
+            synopsis_en: movie.synopsis_en || null,
+            poster_path: movie.poster_path || null,
+            backdrop_path: movie.backdrop_path || null,
+            status: ContentStatus.Archived,
+            noindex: true,
+            sitemap_priority: SitemapPriority.Medium,
+            tmdb_last_synced_at: new Date().toISOString()
+        }
+
+        const result = await MediaService.upsertFromSync(mediaData)
+
+        // Sincronizar géneros
+        if (movie.genres && movie.genres.length > 0) {
+            await MediaService.syncGenres(result.id, movie.genres.map((g: any) => g.id))
+        }
+
+        // Sincronizar videos (formato TMDB)
+        if (movie.videos && movie.videos.length > 0) {
+            await MediaService.syncVideos(result.id, movie.videos.map((v: any) => ({
+                locale: v.locale || v.iso_639_1,
+                video_type: v.type.toLowerCase(),
+                video_site: v.site.toLowerCase(),
+                external_key: v.key,
+                title: v.name,
+                published_at: v.published_at,
+                is_official: v.official
+            })))
+        }
+
+        return ok(c, {
+            id: result.id,
+            slug: result.slug,
+            message: 'Película importada exitosamente con géneros y videos'
+        })
+    } catch (err) {
+        return serverError(c, err)
+    }
+}
 }

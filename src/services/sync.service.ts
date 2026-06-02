@@ -993,7 +993,7 @@ export class SyncMoviesService {
       
       return upserted?.id || null
       
-    } catch (error) {
+    } catch {
       return null
     }
   }

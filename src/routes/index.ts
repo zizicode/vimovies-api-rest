@@ -5,6 +5,7 @@ import authRoutes from './auth.routes'
 import { curatedListsRoutes } from './curated-lists.routes'
 import { dashboardRoutes } from './dashboard.routes'
 import debugRoutes from './debug.routes'
+import { exportRoutes } from './export.routes'
 import { genresRoutes } from './genres.routes'
 import { mediaRoutes } from './media.routes'
 import { peopleRoutes } from './persons.routes'
@@ -58,6 +59,9 @@ router.route('/admin/dashboard', dashboardRoutes)
 
 // Sync operations
 router.route('/admin/sync', syncRoutes)
+
+// Export operations
+router.route('/admin/export', exportRoutes)
 
 // Admin media routes (included in mediaRoutes with auth middleware)
 // Admin genres routes (included in genresRoutes with auth middleware)

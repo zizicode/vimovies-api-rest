@@ -1,7 +1,7 @@
 import { Context } from 'hono'
 import type { ContentfulStatusCode } from 'hono/utils/http-status'
 
-// ── Tipos ────────────────────────────────────────────────────
+// -- Tipos ----------------------------------------------------
 interface PaginatedMeta {
   page     : number
   per_page : number
@@ -9,10 +9,26 @@ interface PaginatedMeta {
   pages    : number
 }
 
-// ── Helpers ──────────────────────────────────────────────────
+type CacheDuration = 'short' | 'medium' | 'long' | 'none'
 
-export const ok = <T>(c: Context, data: T, status: ContentfulStatusCode = 200) =>
-  c.json({ success: true, data }, status as 200)
+const CACHE_HEADERS: Record<CacheDuration, Record<string, string>> = {
+  short: { 'Cache-Control': 'public, max-age=60, s-maxage=60' },
+  medium: { 'Cache-Control': 'public, max-age=300, s-maxage=300' },
+  long: { 'Cache-Control': 'public, max-age=900, s-maxage=900' },
+  none: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+}
+
+// -- Helpers --------------------------------------------------
+
+export const ok = <T>(
+  c: Context,
+  data: T,
+  status: ContentfulStatusCode = 200,
+  cache: CacheDuration = 'medium'
+) => {
+  const headers = CACHE_HEADERS[cache]
+  return c.json({ success: true, data }, status as 200, headers)
+}
 
 export const paginated = <T>(
   c        : Context,
@@ -20,6 +36,7 @@ export const paginated = <T>(
   total    : number,
   page     : number,
   per_page : number,
+  cache    : CacheDuration = 'medium'
 ) => {
   const meta: PaginatedMeta = {
     page,
@@ -27,14 +44,28 @@ export const paginated = <T>(
     total,
     pages: Math.ceil(total / per_page),
   }
-  return c.json({ success: true, data, meta }, 200 as const)
+  const headers = CACHE_HEADERS[cache]
+  return c.json({ success: true, data, meta }, 200 as const, headers)
 }
 
 export const notFound = (c: Context, message = 'Resource not found') =>
-  c.json({ success: false, error: message }, 404 as const)
+  c.json({ success: false, error: message }, 404 as const, CACHE_HEADERS.none)
 
 export const serverError = (c: Context, error: unknown) => {
   const message = error instanceof Error ? error.message : 'Internal server error'
   console.error('[ServerError]', error)
-  return c.json({ success: false, error: message }, 500 as const)
+  return c.json({ success: false, error: message }, 500 as const, CACHE_HEADERS.none)
+}
+
+// Helper espec�fico para HTML renderizado (bots)
+export const htmlWithCache = (
+  c: Context,
+  html: string,
+  cache: CacheDuration = 'long'
+) => {
+  const headers = {
+    ...CACHE_HEADERS[cache],
+    'Content-Type': 'text/html; charset=utf-8'
+  }
+  return c.html(html, 200, headers)
 }
