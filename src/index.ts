@@ -12,6 +12,7 @@ import imageRoutes from './routes/image.routes'
 import renderRoutes from './routes/render.routes'
 import sitemapRoutes from './routes/sitemap.routes'
 import { initializeSocket } from './socket'
+import seoRoutes from './routes/seo.routes'
 
 const app = new Hono()
 
@@ -40,12 +41,7 @@ app.route('/image', imageRoutes)
 app.route('/api', routes)
 
 // Health check保持
-app.get('/', (c) => {
-  return c.json({
-    success: true,
-    message: 'API running'
-  })
-})
+app.route('/', seoRoutes)
 
 const server = serve({
   fetch: app.fetch,
