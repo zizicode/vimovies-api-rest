@@ -12,7 +12,7 @@ export interface MediaFilters {
     noindex?: boolean
     search?: string
     genre_id?: number
-    sort_by?: 'tmdb_popularity' | 'release_date' | 'editorial_rating'
+    sort_by?: 'tmdb_popularity' | 'release_date' | 'editorial_rating' | 'updated_at'
     sort_order?: 'asc' | 'desc'
 }
 

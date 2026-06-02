@@ -3,15 +3,11 @@
 // Agrega estas rutas en tu app principal de Hono
 // ============================================================
 import { Hono } from 'hono'
-import { createClient } from '@supabase/supabase-js'
-import type { Media } from '@/types'
+import { MediaService } from '@/services/media.service'
+import { ContentStatus } from '@/enums'
+import type { Media } from '@/types/media.type'
 
 const seo = new Hono()
-
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!,
-)
 
 // ── Tipos ────────────────────────────────────────────────────
 // interface Movie {
@@ -60,14 +56,15 @@ Sitemap: ${SITE_URL}/sitemap.xml`,
 
 // ── /sitemap.xml ─────────────────────────────────────────────
 seo.get('/sitemap.xml', async (c) => {
-  const { data: movies, error } = await supabase
-    .from('movies')
-    .select('slug, updated_at, sitemap_priority')
-    .eq('status', 'published')
-    .eq('noindex', false)
-    .order('updated_at', { ascending: false })
+  const { data: movies } = await MediaService.findAll({
+    status: ContentStatus.Published,
+    noindex: false,
+    per_page: 1000, // Obtener todas para sitemap
+    sort_by: 'updated_at',
+    sort_order: 'desc'
+  })
 
-  if (error) return c.text('Error generating sitemap', 500)
+  if (!movies) return c.text('Error generating sitemap', 500)
 
   const staticRoutes = [
     { loc: `${SITE_URL}/`,           priority: '1.0', changefreq: 'daily' },
@@ -90,7 +87,7 @@ seo.get('/sitemap.xml', async (c) => {
 
   const movieUrls = (movies ?? [])
     .map(
-      (m) => `
+      (m: Media) => `
   <url>
     <loc>${SITE_URL}/pelicula/${m.slug}</loc>
     <lastmod>${m.updated_at.split('T')[0]}</lastmod>
@@ -126,14 +123,9 @@ seo.get('/ssr/', (c) => {
 seo.get('/ssr/pelicula/:slug', async (c) => {
   const slug = c.req.param('slug')
 
-  const { data: m, error } = await supabase
-    .from('movies')
-    .select('*')
-    .eq('slug', slug)
-    .eq('status', 'published')
-    .single<Media>()
+  const m = await MediaService.findBySlugFull(slug)
 
-  if (error || !m) return c.notFound()
+  if (!m) return c.notFound()
 
   const year        = new Date(m.release_date || '').getFullYear()
   const durationISO = `PT${m.runtime_minutes}M`
