@@ -330,33 +330,37 @@ const notFoundHtml = () => `
 
 // ── Router Principal ───────────────────────────────────────────
 
-// Página de inicio (raíz)
-routes.get('/', async (c) => {
+routes.get('/*', async (c) => {
+  const path = c.req.path.replace('/render', '')
+  const pathParts = path.split('/').filter(Boolean)
   const locale = c.get('locale') || DEFAULT_LOCALE
+  const region = c.req.query('region') ?? 'ES'
 
-  const title = 'Vimovies — Tu guía definitiva de cine y series'
-  const description = 'Descubre dónde ver tus películas y series favoritas, consulta críticas, rankings y noticias del mundo del cine en Vimovies.'
-  const canonical = 'https://vimovies.com/'
-  const ogData = {
-    title,
-    description,
-    image: 'https://vimovies.com/og-image.png',
-    type: 'website',
-    url: canonical
-  }
-  const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    name: 'Vimovies',
-    url: canonical,
-    description,
-    publisher: {
-      '@type': 'Organization',
-      name: 'Vimovies',
+  // Si la ruta está vacía después de quitar /render, mostrar página de inicio
+  if (pathParts.length === 0) {
+    const title = 'Vimovies — Tu guía definitiva de cine y series'
+    const description = 'Descubre dónde ver tus películas y series favoritas, consulta críticas, rankings y noticias del mundo del cine en Vimovies.'
+    const canonical = 'https://vimovies.com/'
+    const ogData = {
+      title,
+      description,
+      image: 'https://vimovies.com/og-image.png',
+      type: 'website',
       url: canonical
     }
-  }
-  const body = `
+    const schema = {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'Vimovies',
+      url: canonical,
+      description,
+      publisher: {
+        '@type': 'Organization',
+        name: 'Vimovies',
+        url: canonical
+      }
+    }
+    const body = `
 <main>
   <section>
     <h1>Vimovies — Tu guía definitiva de cine y series</h1>
@@ -364,16 +368,11 @@ routes.get('/', async (c) => {
   </section>
 </main>`
 
-  const html = baseHtml(title, description, ogData, schema, body, locale)
-  return htmlWithCache(c, html, 'long')
-})
+    const html = baseHtml(title, description, ogData, schema, body, locale)
+    return htmlWithCache(c, html, 'long')
+  }
 
-routes.get('/*', async (c) => {
-  const path = c.req.path.replace('/render', '')
-  const pathParts = path.split('/').filter(Boolean)
   const [section, slug] = pathParts
-  const locale = c.get('locale') || DEFAULT_LOCALE
-  const region = c.req.query('region') ?? 'ES'
 
   console.log(`[Render] Request: section=${section}, slug=${slug}, locale=${locale}, region=${region}`)
 
