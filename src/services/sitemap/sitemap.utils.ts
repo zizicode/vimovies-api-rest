@@ -17,8 +17,9 @@ export function buildUrl(base: string, path: string): string {
 
 // Formatea fecha a YYYY-MM-DD
 export function formatDate(date: string | Date | null | undefined): string {
-  if (!date) return new Date().toISOString().split('T')[0]
-  return new Date(date).toISOString().split('T')[0]
+  if (!date) return new Date().toISOString().split('T')[0] || ''
+  const dateStr = new Date(date as string | Date).toISOString().split('T')[0]
+  return dateStr || ''
 }
 
 // Genera el bloque xhtml:link para hreflang (ES ↔ EN)

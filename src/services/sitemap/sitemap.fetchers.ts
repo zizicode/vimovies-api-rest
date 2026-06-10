@@ -2,11 +2,7 @@ import { MediaService } from '../media.service'
 import { GenreService } from '../genres.service'
 import { ArticlesService } from '../articles.service'
 import { PersonService } from '../persons.service'
-
-interface FetchResult<T> {
-  items: T[]
-  hasMore: boolean
-}
+import { MediaType, ContentStatus } from '@/enums'
 
 // Patrón genérico de paginación
 async function fetchAllPages<T>(
@@ -38,14 +34,14 @@ export async function fetchAllMovieSlugs(): Promise<Array<{ slug: string; update
     (page) => MediaService.findAll({
       page,
       per_page: 100,
-      media_type: 'movie',
-      status: 'published',
+      media_type: MediaType.Movie,
+      status: ContentStatus.Published,
       noindex: false
     }),
     100
   )
 
-  return movies.map(m => ({
+  return movies.map((m: any) => ({
     slug: m.slug,
     updated_at: m.updated_at
   }))
@@ -58,7 +54,7 @@ export async function fetchAllPersonSlugs(): Promise<Array<{ slug: string; updat
     100
   )
 
-  return people.map(p => ({
+  return people.map((p: any) => ({
     slug: p.slug,
     updated_at: p.updated_at
   }))
@@ -71,7 +67,7 @@ export async function fetchAllGenreSlugs(): Promise<Array<{ slug: string; update
     100
   )
 
-  return genres.map(g => ({
+  return genres.map((g: any) => ({
     slug: g.slug,
     updated_at: g.updated_at
   }))
@@ -83,13 +79,13 @@ export async function fetchAllArticleSlugs(): Promise<Array<{ slug: string; publ
     (page) => ArticlesService.findAll({
       page,
       per_page: 100,
-      status: 'published'
+      status: ContentStatus.Published
     }),
     100
   )
 
-  return articles.map(a => ({
+  return articles.map((a: any) => ({
     slug: a.slug,
-    published_at: a.published_at
+    published_at: a.published_at || undefined
   }))
 }

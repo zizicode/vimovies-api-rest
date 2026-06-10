@@ -4,8 +4,6 @@
 // ============================================================
 import { Hono } from 'hono'
 import { MediaService } from '@/services/media.service'
-import { ContentStatus } from '@/enums'
-import type { Media } from '@/types/media.type'
 
 const seo = new Hono()
 
