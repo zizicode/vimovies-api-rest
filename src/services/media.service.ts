@@ -76,7 +76,7 @@ export const MediaService = {
 
             if (status) query = query.eq('status', status)
             // Default to draft if no status specified
-            if (!status) query = query.eq('status', 'draft')
+            if (!status) query = query.eq('status', 'published')
             if (media_type) query = query.eq('media_type', media_type)
             if (noindex !== undefined) query = query.eq('noindex', noindex)
 
@@ -140,7 +140,7 @@ export const MediaService = {
 
         if (status) query = query.eq('status', status)
         // Default to draft if no status specified
-        if (!status) query = query.eq('status', 'draft')
+        if (!status) query = query.eq('status', 'published')
         if (media_type) query = query.eq('media_type', media_type)
         if (noindex !== undefined) query = query.eq('noindex', noindex)
 

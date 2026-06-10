@@ -225,6 +225,52 @@ routes.get('/sitemap-series.xml', async (c) => {
   }
 })
 
+// Sitemap de series en inglés
+routes.get('/sitemap-series-en.xml', async (c) => {
+  try {
+    const { data, error } = await supabase
+      .from('media')
+      .select('slug, updated_at, sitemap_priority')
+      .eq('media_type', 'tv')
+      .eq('status', 'published')
+      .eq('noindex', false)
+      .order('tmdb_popularity', { ascending: false })
+      .limit(5000)
+
+    if (error) throw error
+
+    const items = (data || []).map((item: SitemapItem) => ({
+      slug: item.slug,
+      lastmod: item.updated_at || new Date().toISOString(),
+      priority: Math.max(0.1, getPriorityNumber(item.sitemap_priority || 'medium') - 0.1)
+    }))
+
+    // Solo versión en inglés
+    const urls = items.map((item: SitemapUrl) => ({
+      loc: `https://vimovies.com/tv/${item.slug}`,
+      lastmod: item.lastmod,
+      priority: item.priority,
+      alternates: {
+        es: `https://vimovies.com/serie/${item.slug}`,
+        en: `https://vimovies.com/tv/${item.slug}`
+      }
+    }))
+
+    const xml = generateUrlSet(urls)
+
+    return c.text(xml, 200, {
+      'Content-Type': 'application/xml; charset=utf-8',
+      'Cache-Control': 'public, max-age=3600'
+    })
+
+  } catch (error) {
+    console.error('[Sitemap] Error generating series EN sitemap:', error)
+    return c.text(generateUrlSet([]), 200, {
+      'Content-Type': 'application/xml; charset=utf-8'
+    })
+  }
+})
+
 // ── Sitemap de Actores ───────────────────────────────────────
 
 routes.get('/sitemap-actores.xml', async (c) => {
@@ -260,6 +306,51 @@ routes.get('/sitemap-actores.xml', async (c) => {
   }
 })
 
+// Sitemap de actores en inglés
+routes.get('/sitemap-actores-en.xml', async (c) => {
+  try {
+    const { data, error } = await supabase
+      .from('people')
+      .select('slug, updated_at, sitemap_priority')
+      .eq('status', 'published')
+      .eq('noindex', false)
+      .order('popularity', { ascending: false })
+      .limit(5000)
+
+    if (error) throw error
+
+    const items = (data || []).map((item: SitemapItem) => ({
+      slug: item.slug,
+      lastmod: item.updated_at || new Date().toISOString(),
+      priority: Math.max(0.1, getPriorityNumber(item.sitemap_priority || 'medium') - 0.1)
+    }))
+
+    // Solo versión en inglés
+    const urls = items.map((item: SitemapUrl) => ({
+      loc: `https://vimovies.com/person/${item.slug}`,
+      lastmod: item.lastmod,
+      priority: item.priority,
+      alternates: {
+        es: `https://vimovies.com/actor/${item.slug}`,
+        en: `https://vimovies.com/person/${item.slug}`
+      }
+    }))
+
+    const xml = generateUrlSet(urls)
+
+    return c.text(xml, 200, {
+      'Content-Type': 'application/xml; charset=utf-8',
+      'Cache-Control': 'public, max-age=3600'
+    })
+
+  } catch (error) {
+    console.error('[Sitemap] Error generating actors EN sitemap:', error)
+    return c.text(generateUrlSet([]), 200, {
+      'Content-Type': 'application/xml; charset=utf-8'
+    })
+  }
+})
+
 // ── Sitemap de Géneros ───────────────────────────────────────
 
 routes.get('/sitemap-generos.xml', async (c) => {
@@ -287,6 +378,42 @@ routes.get('/sitemap-generos.xml', async (c) => {
 
   } catch (error) {
     console.error('[Sitemap] Error generating genres sitemap:', error)
+    return c.text(generateUrlSet([]), 200, {
+      'Content-Type': 'application/xml; charset=utf-8'
+    })
+  }
+})
+
+// Sitemap de géneros en inglés
+routes.get('/sitemap-generos-en.xml', async (c) => {
+  try {
+    const { data, error } = await supabase
+      .from('genres')
+      .select('slug, updated_at')
+      .eq('status', 'published')
+      .order('name', { ascending: true })
+
+    if (error) throw error
+
+    const urls = (data || []).map((item: SitemapItem) => ({
+      loc: `https://vimovies.com/genre/${item.slug}`,
+      lastmod: item.updated_at || new Date().toISOString(),
+      priority: 0.7,
+      alternates: {
+        es: `https://vimovies.com/genero/${item.slug}`,
+        en: `https://vimovies.com/genre/${item.slug}`
+      }
+    }))
+
+    const xml = generateUrlSet(urls)
+
+    return c.text(xml, 200, {
+      'Content-Type': 'application/xml; charset=utf-8',
+      'Cache-Control': 'public, max-age=3600'
+    })
+
+  } catch (error) {
+    console.error('[Sitemap] Error generating genres EN sitemap:', error)
     return c.text(generateUrlSet([]), 200, {
       'Content-Type': 'application/xml; charset=utf-8'
     })
@@ -328,6 +455,51 @@ routes.get('/sitemap-articulos.xml', async (c) => {
   }
 })
 
+// Sitemap de artículos en inglés
+routes.get('/sitemap-articulos-en.xml', async (c) => {
+  try {
+    const { data, error } = await supabase
+      .from('articles')
+      .select('slug, updated_at, sitemap_priority')
+      .eq('status', 'published')
+      .eq('noindex', false)
+      .order('published_at', { ascending: false })
+      .limit(5000)
+
+    if (error) throw error
+
+    const items = (data || []).map((item: SitemapItem) => ({
+      slug: item.slug,
+      lastmod: item.updated_at || new Date().toISOString(),
+      priority: Math.max(0.1, getPriorityNumber(item.sitemap_priority || 'medium') - 0.1)
+    }))
+
+    // Solo versión en inglés
+    const urls = items.map((item: SitemapUrl) => ({
+      loc: `https://vimovies.com/article/${item.slug}`,
+      lastmod: item.lastmod,
+      priority: item.priority,
+      alternates: {
+        es: `https://vimovies.com/articulo/${item.slug}`,
+        en: `https://vimovies.com/article/${item.slug}`
+      }
+    }))
+
+    const xml = generateUrlSet(urls)
+
+    return c.text(xml, 200, {
+      'Content-Type': 'application/xml; charset=utf-8',
+      'Cache-Control': 'public, max-age=3600'
+    })
+
+  } catch (error) {
+    console.error('[Sitemap] Error generating articles EN sitemap:', error)
+    return c.text(generateUrlSet([]), 200, {
+      'Content-Type': 'application/xml; charset=utf-8'
+    })
+  }
+})
+
 // ── Sitemap de Plataformas ───────────────────────────────────
 
 routes.get('/sitemap-plataformas.xml', async (c) => {
@@ -355,6 +527,42 @@ routes.get('/sitemap-plataformas.xml', async (c) => {
 
   } catch (error) {
     console.error('[Sitemap] Error generating platforms sitemap:', error)
+    return c.text(generateUrlSet([]), 200, {
+      'Content-Type': 'application/xml; charset=utf-8'
+    })
+  }
+})
+
+// Sitemap de plataformas en inglés
+routes.get('/sitemap-plataformas-en.xml', async (c) => {
+  try {
+    const { data, error } = await supabase
+      .from('platforms')
+      .select('slug, updated_at')
+      .eq('status', 'published')
+      .order('display_order', { ascending: true })
+
+    if (error) throw error
+
+    const urls = (data || []).map((item: SitemapItem) => ({
+      loc: `https://vimovies.com/platform/${item.slug}`,
+      lastmod: item.updated_at || new Date().toISOString(),
+      priority: 0.6,
+      alternates: {
+        es: `https://vimovies.com/plataforma/${item.slug}`,
+        en: `https://vimovies.com/platform/${item.slug}`
+      }
+    }))
+
+    const xml = generateUrlSet(urls)
+
+    return c.text(xml, 200, {
+      'Content-Type': 'application/xml; charset=utf-8',
+      'Cache-Control': 'public, max-age=3600'
+    })
+
+  } catch (error) {
+    console.error('[Sitemap] Error generating platforms EN sitemap:', error)
     return c.text(generateUrlSet([]), 200, {
       'Content-Type': 'application/xml; charset=utf-8'
     })
@@ -391,6 +599,52 @@ routes.get('/sitemap-listas.xml', async (c) => {
 
   } catch (error) {
     console.error('[Sitemap] Error generating lists sitemap:', error)
+    return c.text(generateUrlSet([]), 200, {
+      'Content-Type': 'application/xml; charset=utf-8'
+    })
+  }
+})
+
+// Sitemap de listas en inglés
+routes.get('/sitemap-listas-en.xml', async (c) => {
+  try {
+    const { data, error } = await supabase
+      .from('curated_lists')
+      .select('slug, updated_at, sitemap_priority')
+      .eq('status', 'published')
+      .eq('noindex', false)
+      .order('is_featured', { ascending: false })
+      .order('updated_at', { ascending: false })
+      .limit(5000)
+
+    if (error) throw error
+
+    const items = (data || []).map((item: SitemapItem) => ({
+      slug: item.slug,
+      lastmod: item.updated_at || new Date().toISOString(),
+      priority: Math.max(0.1, getPriorityNumber(item.sitemap_priority || 'medium') - 0.1)
+    }))
+
+    // Solo versión en inglés
+    const urls = items.map((item: SitemapUrl) => ({
+      loc: `https://vimovies.com/list/${item.slug}`,
+      lastmod: item.lastmod,
+      priority: item.priority,
+      alternates: {
+        es: `https://vimovies.com/lista/${item.slug}`,
+        en: `https://vimovies.com/list/${item.slug}`
+      }
+    }))
+
+    const xml = generateUrlSet(urls)
+
+    return c.text(xml, 200, {
+      'Content-Type': 'application/xml; charset=utf-8',
+      'Cache-Control': 'public, max-age=3600'
+    })
+
+  } catch (error) {
+    console.error('[Sitemap] Error generating lists EN sitemap:', error)
     return c.text(generateUrlSet([]), 200, {
       'Content-Type': 'application/xml; charset=utf-8'
     })
