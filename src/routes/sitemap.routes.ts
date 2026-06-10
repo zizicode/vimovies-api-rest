@@ -4,6 +4,25 @@ import { supabase } from '../config/supabase'
 
 const routes = new Hono()
 
+// ── Types ─────────────────────────────────────────────────────
+
+interface SitemapItem {
+  slug: string
+  updated_at?: string
+  sitemap_priority?: string
+}
+
+interface SitemapUrl {
+  slug: string
+  loc: string
+  lastmod: string
+  priority: number
+  alternates?: {
+    es: string
+    en: string
+  }
+}
+
 // ── Helper Functions ───────────────────────────────────────
 
 const getPriorityNumber = (priority: string): number => {
@@ -92,14 +111,14 @@ routes.get('/sitemap-peliculas.xml', async (c) => {
 
     if (error) throw error
 
-    const items = (data || []).map(item => ({
+    const items = (data || []).map((item: SitemapItem) => ({
       slug: item.slug,
       lastmod: item.updated_at || new Date().toISOString(),
       priority: getPriorityNumber(item.sitemap_priority || 'medium')
     }))
 
     // Solo versión en español
-    const urls = items.map(item => ({
+    const urls = items.map((item: SitemapUrl) => ({
       loc: `https://vimovies.com/pelicula/${item.slug}`,
       lastmod: item.lastmod,
       priority: item.priority,
@@ -138,14 +157,14 @@ routes.get('/sitemap-peliculas-en.xml', async (c) => {
 
     if (error) throw error
 
-    const items = (data || []).map(item => ({
+    const items = (data || []).map((item: SitemapItem) => ({
       slug: item.slug,
       lastmod: item.updated_at || new Date().toISOString(),
       priority: Math.max(0.1, getPriorityNumber(item.sitemap_priority || 'medium') - 0.1)
     }))
 
     // Solo versión en inglés
-    const urls = items.map(item => ({
+    const urls = items.map((item: SitemapUrl) => ({
       loc: `https://vimovies.com/movie/${item.slug}`,
       lastmod: item.lastmod,
       priority: item.priority,
@@ -185,7 +204,7 @@ routes.get('/sitemap-series.xml', async (c) => {
 
     if (error) throw error
 
-    const urls = (data || []).map(item => ({
+    const urls = (data || []).map((item: SitemapItem) => ({
       loc: `https://vimovies.com/serie/${item.slug}`,
       lastmod: item.updated_at || new Date().toISOString(),
       priority: getPriorityNumber(item.sitemap_priority || 'medium')
@@ -220,7 +239,7 @@ routes.get('/sitemap-actores.xml', async (c) => {
 
     if (error) throw error
 
-    const urls = (data || []).map(item => ({
+    const urls = (data || []).map((item: SitemapItem) => ({
       loc: `https://vimovies.com/actor/${item.slug}`,
       lastmod: item.updated_at || new Date().toISOString(),
       priority: getPriorityNumber(item.sitemap_priority || 'medium')
@@ -253,7 +272,7 @@ routes.get('/sitemap-generos.xml', async (c) => {
 
     if (error) throw error
 
-    const urls = (data || []).map(item => ({
+    const urls = (data || []).map((item: SitemapItem) => ({
       loc: `https://vimovies.com/genero/${item.slug}`,
       lastmod: item.updated_at || new Date().toISOString(),
       priority: 0.8
@@ -288,7 +307,7 @@ routes.get('/sitemap-articulos.xml', async (c) => {
 
     if (error) throw error
 
-    const urls = (data || []).map(item => ({
+    const urls = (data || []).map((item: SitemapItem) => ({
       loc: `https://vimovies.com/articulo/${item.slug}`,
       lastmod: item.updated_at || new Date().toISOString(),
       priority: getPriorityNumber(item.sitemap_priority || 'medium')
@@ -321,7 +340,7 @@ routes.get('/sitemap-plataformas.xml', async (c) => {
 
     if (error) throw error
 
-    const urls = (data || []).map(item => ({
+    const urls = (data || []).map((item: SitemapItem) => ({
       loc: `https://vimovies.com/plataforma/${item.slug}`,
       lastmod: item.updated_at || new Date().toISOString(),
       priority: 0.6
@@ -357,7 +376,7 @@ routes.get('/sitemap-listas.xml', async (c) => {
 
     if (error) throw error
 
-    const urls = (data || []).map(item => ({
+    const urls = (data || []).map((item: SitemapItem) => ({
       loc: `https://vimovies.com/lista/${item.slug}`,
       lastmod: item.updated_at || new Date().toISOString(),
       priority: getPriorityNumber(item.sitemap_priority || 'medium')

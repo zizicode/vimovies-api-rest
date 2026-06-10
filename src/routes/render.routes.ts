@@ -124,7 +124,7 @@ async function renderEnglishMirror(
   section: string,
   slug: string,
   spanishSection: string,
-  englishSection: string
+  _englishSection: string
 ): Promise<Response> {
   const locale = 'en' as SupportedLocale
   const region = c.req.query('region') ?? 'US'
