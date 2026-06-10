@@ -330,6 +330,44 @@ const notFoundHtml = () => `
 
 // ── Router Principal ───────────────────────────────────────────
 
+// Página de inicio (raíz)
+routes.get('/', async (c) => {
+  const locale = c.get('locale') || DEFAULT_LOCALE
+
+  const title = 'Vimovies — Tu guía definitiva de cine y series'
+  const description = 'Descubre dónde ver tus películas y series favoritas, consulta críticas, rankings y noticias del mundo del cine en Vimovies.'
+  const canonical = 'https://vimovies.com/'
+  const ogData = {
+    title,
+    description,
+    image: 'https://vimovies.com/og-image.png',
+    type: 'website',
+    url: canonical
+  }
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Vimovies',
+    url: canonical,
+    description,
+    publisher: {
+      '@type': 'Organization',
+      name: 'Vimovies',
+      url: canonical
+    }
+  }
+  const body = `
+<main>
+  <section>
+    <h1>Vimovies — Tu guía definitiva de cine y series</h1>
+    <p>Descubre dónde ver tus películas y series favoritas, consulta críticas, rankings y noticias del mundo del cine en Vimovies.</p>
+  </section>
+</main>`
+
+  const html = baseHtml(title, description, ogData, schema, body, locale)
+  return htmlWithCache(c, html, 'long')
+})
+
 routes.get('/*', async (c) => {
   const path = c.req.path.replace('/render', '')
   const pathParts = path.split('/').filter(Boolean)
