@@ -37,90 +37,15 @@ const seo = new Hono()
 // }
 
 const SITE_URL = 'https://vimovies.com'
-const PRIORITY = { high: '1.0', medium: '0.7', low: '0.4' } as const
 
-// ── /robots.txt ──────────────────────────────────────────────
-seo.get('/robots.txt', (c) => {
-  return c.text(
-    `User-agent: *
-Allow: /
-Disallow: /api/
-Disallow: /auth/
-Disallow: /dashboard/
-
-Sitemap: ${SITE_URL}/sitemap.xml`,
-    200,
-    { 'Content-Type': 'text/plain' },
-  )
-})
-
-// ── /sitemap.xml ─────────────────────────────────────────────
-seo.get('/sitemap.xml', async (c) => {
-  const { data: movies } = await MediaService.findAll({
-    status: ContentStatus.Published,
-    noindex: false,
-    per_page: 1000, // Obtener todas para sitemap
-    sort_by: 'updated_at',
-    sort_order: 'desc'
-  })
-
-  if (!movies) return c.text('Error generating sitemap', 500)
-
-  const staticRoutes = [
-    { loc: `${SITE_URL}/`,           priority: '1.0', changefreq: 'daily' },
-    { loc: `${SITE_URL}/peliculas`,  priority: '0.9', changefreq: 'daily' },
-    { loc: `${SITE_URL}/series`,     priority: '0.9', changefreq: 'daily' },
-    { loc: `${SITE_URL}/novedades`,  priority: '0.8', changefreq: 'weekly' },
-    { loc: `${SITE_URL}/top-peliculas`, priority: '0.8', changefreq: 'weekly' },
-  ]
-
-  const staticUrls = staticRoutes
-    .map(
-      (r) => `
-  <url>
-    <loc>${r.loc}</loc>
-    <changefreq>${r.changefreq}</changefreq>
-    <priority>${r.priority}</priority>
-  </url>`,
-    )
-    .join('')
-
-  const movieUrls = (movies ?? [])
-    .map(
-      (m: Media) => `
-  <url>
-    <loc>${SITE_URL}/pelicula/${m.slug}</loc>
-    <lastmod>${m.updated_at.split('T')[0]}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>${PRIORITY[m.sitemap_priority as keyof typeof PRIORITY] ?? '0.5'}</priority>
-  </url>`,
-    )
-    .join('')
-
-const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset
-  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-    http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-${staticUrls}
-${movieUrls}
-</urlset>`
-
-  return c.body(xml, 200, {
-    'Content-Type': 'application/xml; charset=utf-8',
-    'Cache-Control': 'public, max-age=3600', // cachea 1 hora
-  })
-})
-
-// ── /ssr/* — SSR para bots ───────────────────────────────────
+// ── SSR para bots ─────────────────────────────────────────────
 // Página de mantenimiento SSR (mientras no haya contenido)
-seo.get('/ssr/', (c) => {
+seo.get('/', (c) => {
   return c.html(maintenanceHtml())
 })
 
 // Detalle de película SSR
-seo.get('/ssr/pelicula/:slug', async (c) => {
+seo.get('/pelicula/:slug', async (c) => {
   const slug = c.req.param('slug')
 
   const m = await MediaService.findBySlugFull(slug)

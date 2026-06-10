@@ -17,7 +17,7 @@ export const PeopleController = {
     }
   },
 
-  // GET /search?q=nolan   — se combina con MediaController.search en el route
+  // GET /people?q=nolan   — se combina con MediaController.search en el route
   async search(c: Context) {
     try {
       const q     = c.req.query('q') ?? ''
@@ -25,6 +25,23 @@ export const PeopleController = {
       if (!q.trim()) return ok(c, [])
       const results = await PersonService.search(q, limit)
       return ok(c, results)
+    } catch (err) {
+      return serverError(c, err)
+    }
+  },
+
+  // GET /people — Listado público para sitemap
+  async list(c: Context) {
+    try {
+      const page     = Number(c.req.query('page')     ?? 1)
+      const per_page = Number(c.req.query('per_page') ?? 100)
+      const { data, total } = await PersonService.findAll(page, per_page)
+      // Solo devolver campos necesarios para sitemap
+      const slimData = data.map(p => ({
+        slug: p.slug,
+        updated_at: p.updated_at
+      }))
+      return paginated(c, slimData, total, page, per_page)
     } catch (err) {
       return serverError(c, err)
     }

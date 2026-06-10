@@ -35,14 +35,12 @@ app.use('*', botMiddleware)
 
 // Rutas SEO (antes de las rutas de API)
 app.route('/render', renderRoutes)
-app.route('/', sitemapRoutes) // sitemap.xml y robots.txt en raíz
+app.route('/', sitemapRoutes) // sitemap.xml, robots.txt y sitemaps hijos
+app.route('/ssr', seoRoutes) // Rutas SSR en /ssr
 app.route('/image', imageRoutes)
 
 // Rutas de API existentes
 app.route('/api', routes)
-
-// Health check保持
-app.route('/', seoRoutes)
 
 const server = serve({
   fetch: app.fetch,

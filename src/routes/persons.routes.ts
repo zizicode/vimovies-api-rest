@@ -24,6 +24,9 @@ peopleRoutes.delete('/admin/:id', PeopleController.remove)
 
 // ── Public Routes ────────────────────────────────────────────────────────
 
+// GET /people — Listado público para sitemap
+peopleRoutes.get('/', PeopleController.list)
+
 // GET /people/search
 peopleRoutes.get('/search', PeopleController.search)
 
