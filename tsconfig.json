@@ -14,6 +14,7 @@
     "forceConsistentCasingInFileNames": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "ignoreDeprecations": "5.0",
     "baseUrl": "./src",
     "paths": {
       "@/*": ["*"],

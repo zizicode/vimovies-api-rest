@@ -3,6 +3,7 @@ import { Hono } from 'hono'
 import { articlesRoutes } from './articles.routes'
 import authRoutes from './auth.routes'
 import { curatedListsRoutes } from './curated-lists.routes'
+import { DashboardController } from '../controllers/dashboard.controller'
 import { dashboardRoutes } from './dashboard.routes'
 import debugRoutes from './debug.routes'
 import { exportRoutes } from './export.routes'
@@ -19,6 +20,9 @@ import { syncRoutes } from './sync.routes'
 export const router = new Hono()
 
 // ── Public Routes ───────────────────────────────────────────────
+
+// Public stats endpoint (for home page)
+router.get('/stats', DashboardController.getStats)
 
 // Media (movies/series)
 router.route('/media', mediaRoutes)

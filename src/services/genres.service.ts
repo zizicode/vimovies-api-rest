@@ -57,6 +57,20 @@ export interface GenreWithMedia {
     status:           string
     noindex:          boolean
   }>
+  pagination: {
+    page: number
+    per_page: number
+    total: number
+    pages: number
+  }
+}
+
+export interface GenreStats {
+  genre_id: number
+  slug: string
+  name_es: string
+  name_en: string
+  media_count: number
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -84,18 +98,31 @@ export const GenreService = {
   },
 
   /**
-   * Busca un género por su slug.
+   * Busca un género por su slug (en español o inglés).
    * Uso: pillar page /genero/:slug
    */
   async findBySlug(slug: string): Promise<Genre | null> {
+    console.log('[GenreService] findBySlug called with:', slug)
+    // Primero buscar por slug exacto (español)
     const { data, error } = await supabase
       .from('genres')
       .select('*')
       .eq('slug', slug)
       .single()
 
-    if (error) return null
-    return data as Genre
+    console.log('[GenreService] First query result:', { data, error })
+    if (!error && data) return data as Genre
+
+    // Si no encuentra, buscar por nombre en inglés convertido a slug
+    const { data: dataByEn, error: errorByEn } = await supabase
+      .from('genres')
+      .select('*')
+      .ilike('name_en', slug.replace(/-/g, ' '))
+      .single()
+
+    console.log('[GenreService] Second query result:', { dataByEn, errorByEn })
+    if (errorByEn) return null
+    return dataByEn as Genre
   },
 
   /**
@@ -114,34 +141,73 @@ export const GenreService = {
   },
 
   /**
-   * Género + N películas más populares de ese género.
+   * Género + N películas más populares de ese género con paginación y búsqueda.
    * Uso: renderizar la pillar page completa /genero/:slug
    */
-  async findBySlugWithMedia(slug: string, limit = 20): Promise<GenreWithMedia | null> {
+  async findBySlugWithMedia(
+    slug: string,
+    page = 1,
+    per_page = 20,
+    search?: string
+  ): Promise<GenreWithMedia | null> {
     const genre = await GenreService.findBySlug(slug)
     if (!genre) return null
 
-    const { data: mediaData, error: mediaError } = await supabase
+    const from = (page - 1) * per_page
+    const to = from + per_page - 1
+
+    // Filter by genre through media_genres relationship
+    const { data: genreRelations } = await supabase
       .from('media_genres')
-      .select(`
-        media (
-          id, slug, title_es, title_en,
-          poster_path, backdrop_path,
-          release_date, tmdb_popularity,
-          editorial_rating, status, noindex
-        )
-      `)
+      .select('media_id')
       .eq('genre_id', genre.id)
-      .eq('media.status', 'published')
-      .eq('media.noindex', false)
-      .order('media(tmdb_popularity)', { ascending: false })
-      .limit(limit)
+
+    const mediaIds = genreRelations?.map((r: any) => r.media_id) || []
+    if (mediaIds.length === 0) {
+      // No media for this genre
+      return {
+        genre,
+        media: [],
+        pagination: { page, per_page, total: 0, pages: 0 }
+      }
+    }
+
+    // Query media table directly with genre filter
+    let query = supabase
+      .from('media')
+      .select(`
+        id, slug, title_es, title_en,
+        poster_path, backdrop_path,
+        release_date, tmdb_popularity,
+        editorial_rating, status, noindex
+      `, { count: 'exact' })
+      .eq('status', 'published')
+      .in('id', mediaIds)
+
+    // Aplicar búsqueda si se proporciona (ANTES de order y range)
+    if (search) {
+      query = query.or(`title_es.ilike.%${search}%,title_en.ilike.%${search}%,original_title.ilike.%${search}%`)
+    }
+
+    const { data: mediaData, error: mediaError, count } = await query
+      .order('tmdb_popularity', { ascending: false })
+      .range(from, to)
 
     if (mediaError) throw mediaError
 
+    const media = mediaData ?? []
+    const total = count ?? 0
+    const pages = Math.ceil(total / per_page)
+
     return {
       genre,
-      media: (mediaData ?? []).map((row: any) => row.media).filter(Boolean),
+      media,
+      pagination: {
+        page,
+        per_page,
+        total,
+        pages
+      }
     }
   },
 
@@ -187,5 +253,32 @@ export const GenreService = {
       .eq('id', id)
 
     if (error) throw error
+  },
+
+  /**
+   * Estadísticas de géneros: cuántas películas tiene cada género.
+   * Uso: mostrar contadores en el slider de géneros.
+   */
+  async getStats(): Promise<GenreStats[]> {
+    const { data, error } = await supabase
+      .from('genres')
+      .select(`
+        id,
+        slug,
+        name_es,
+        name_en,
+        media_genres(count)
+      `)
+      .order('name_es', { ascending: true })
+
+    if (error) throw error
+
+    return (data ?? []).map((g: any) => ({
+      genre_id: g.id,
+      slug: g.slug,
+      name_es: g.name_es,
+      name_en: g.name_en,
+      media_count: g.media_genres?.[0]?.count ?? 0
+    }))
   },
 }

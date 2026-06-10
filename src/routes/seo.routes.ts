@@ -1,5 +1,5 @@
 // ============================================================
-// seo.routes.ts — Rutas SEO y SSR · Hono · VIMovies
+// seo.routes.ts — Rutas SEO y SSR · Hono · Vimovies
 // Agrega estas rutas en tu app principal de Hono
 // ============================================================
 import { Hono } from 'hono'
@@ -97,12 +97,12 @@ seo.get('/sitemap.xml', async (c) => {
     )
     .join('')
 
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset
-  xmlns="http://www.sitemaps.org/schemas/0.9/sitemap"
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.sitemaps.org/schemas/0.9/sitemap
-    http://www.sitemaps.org/schemas/0.9/sitemap.xsd">
+  xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+    http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 ${staticUrls}
 ${movieUrls}
 </urlset>`
@@ -155,7 +155,7 @@ seo.get('/ssr/pelicula/:slug', async (c) => {
         },
         review: {
           '@type': 'Review',
-          author: { '@type': 'Organization', name: 'VIMovies' },
+          author: { '@type': 'Organization', name: 'Vimovies' },
           reviewBody: m.editorial_review_es,
           reviewRating: {
             '@type': 'Rating',
@@ -177,7 +177,7 @@ seo.get('/ssr/pelicula/:slug', async (c) => {
         url: pageUrl,
         name: m.seo_title_es,
         description: m.seo_description_es,
-        publisher: { '@type': 'Organization', name: 'VIMovies', url: SITE_URL },
+        publisher: { '@type': 'Organization', name: 'Vimovies', url: SITE_URL },
       },
     ],
   }
@@ -202,7 +202,7 @@ seo.get('/ssr/pelicula/:slug', async (c) => {
   <meta property="og:image"       content="${ogImage}">
   <meta property="og:image:width" content="780">
   <meta property="og:locale"      content="es_ES">
-  <meta property="og:site_name"   content="VIMovies">
+  <meta property="og:site_name"   content="Vimovies">
 
   <meta name="twitter:card"        content="summary_large_image">
   <meta name="twitter:title"       content="${m.seo_title_es}">
@@ -247,7 +247,7 @@ seo.get('/ssr/pelicula/:slug', async (c) => {
         </dl>
       </section>
       <section aria-label="Reseña editorial" itemprop="review" itemscope itemtype="https://schema.org/Review">
-        <h2>Reseña de VIMovies</h2>
+        <h2>Reseña de Vimovies</h2>
         <p itemprop="reviewBody">${m.editorial_review_es}</p>
         <p>Veredicto: <strong>${m.editorial_verdict_es}</strong></p>
         <p>
@@ -274,29 +274,29 @@ function maintenanceHtml(): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>VIMovies — Próximamente el mejor catálogo de películas</title>
-  <meta name="description" content="VIMovies llegará pronto con el mejor catálogo de películas: trailers, sinopsis, reseñas editoriales y dónde ver tus películas favoritas online.">
+  <title>Vimovies — Próximamente el mejor catálogo de películas</title>
+  <meta name="description" content="Vimovies llegará pronto con el mejor catálogo de películas: trailers, sinopsis, reseñas editoriales y dónde ver tus películas favoritas online.">
   <link rel="canonical" href="${SITE_URL}/">
   <meta name="robots" content="index,follow">
-  <meta property="og:title" content="VIMovies — Próximamente">
+  <meta property="og:title" content="Vimovies — Próximamente">
   <meta property="og:description" content="El mejor catálogo de películas está en camino.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="${SITE_URL}/">
-  <meta property="og:site_name" content="VIMovies">
+  <meta property="og:site_name" content="Vimovies">
   <script type="application/ld+json">${JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'VIMovies',
+    name: 'Vimovies',
     url: SITE_URL,
     description: 'Plataforma de recomendaciones de películas con trailers, sinopsis y reseñas.',
-    publisher: { '@type': 'Organization', name: 'VIMovies', url: SITE_URL },
+    publisher: { '@type': 'Organization', name: 'Vimovies', url: SITE_URL },
   })}</script>
 </head>
 <body>
   <main>
-    <h1>VIMovies — Próximamente</h1>
+    <h1>Vimovies — Próximamente</h1>
     <p>
-      VIMovies será tu destino definitivo para descubrir cine: accede a trailers exclusivos,
+      Vimovies será tu destino definitivo para descubrir cine: accede a trailers exclusivos,
       sinopsis detalladas, reseñas editoriales y toda la información de tus películas favoritas,
       incluyendo dónde verlas online. Un catálogo curado, diseñado para los que viven el cine.
     </p>

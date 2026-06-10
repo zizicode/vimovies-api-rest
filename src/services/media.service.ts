@@ -1,10 +1,37 @@
 import { supabase } from "@/config/supabase"
 import { Media, MediaDetail, MediaFilters, MediaListResult, PatchMediaInput, SyncVideoInput, UpdateEditorialInput, UpsertMediaInput, UpsertRatingInput } from "@/types"
 
+/**
+ * Enriquece los créditos con los datos de las personas
+ */
+async function enrichCreditsWithPeople(credits: any[]): Promise<any[]> {
+    if (credits.length === 0) return []
+
+    // Obtener todos los person_id únicos
+    const personIds = [...new Set(credits.map(c => c.person_id))]
+
+    // Obtener todas las personas en una sola query
+    const { data: people } = await supabase
+        .from('people')
+        .select('id, tmdb_id, slug, name, profile_path, tmdb_popularity, gender, sitemap_priority, created_at, updated_at')
+        .in('id', personIds)
+
+    // Crear mapa para búsqueda rápida
+    const peopleMap = new Map((people ?? []).map((p: any) => [p.id, p]))
+
+    // Enriquecer cada crédito con su persona
+    return credits.map((credit: any) => ({
+        ...credit,
+        person: peopleMap.get(credit.person_id) || null
+    }))
+}
+
 export const MediaService = {
     /**
      * Lista paginada de películas/series para la web pública.
      * Por defecto: publicadas, ordenadas por popularidad descendente.
+     * En desarrollo (localhost): permite ver contenido no publicado.
+     * En producción: solo muestra contenido 'published'.
      */
 
     async findAll(filters: MediaFilters = {}): Promise<any> {
@@ -42,12 +69,14 @@ export const MediaService = {
             let query = supabase
                 .from('media')
                 .select(
-                    'id, tmdb_id, imdb_id, slug, media_type, original_title, original_language, release_date, runtime_minutes, tmdb_popularity, title_es, title_en, synopsis_es, synopsis_en, editorial_review_es, editorial_review_en, editorial_rating, editorial_verdict_es, editorial_verdict_en, poster_path, backdrop_path, logo_path, seo_title_es, seo_title_en, seo_description_es, seo_description_en, og_image_url, status, is_prerendered, sitemap_priority, noindex, tmdb_last_synced_at, created_at, updated_at, media_genres(genre_id)',
+                    'id, tmdb_id, slug, media_type, original_title, release_date, runtime_minutes, tmdb_popularity, title_es, title_en, synopsis_es, synopsis_en, editorial_rating, poster_path, backdrop_path, status, noindex, media_genres(genre_id)',
                     { count: 'exact' }
                 )
                 .in('id', mediaIds)
 
             if (status) query = query.eq('status', status)
+            // Default to draft if no status specified
+            if (!status) query = query.eq('status', 'draft')
             if (media_type) query = query.eq('media_type', media_type)
             if (noindex !== undefined) query = query.eq('noindex', noindex)
 
@@ -104,12 +133,14 @@ export const MediaService = {
         let query = supabase
             .from('media')
             .select(
-                'id, tmdb_id, imdb_id, slug, media_type, original_title, original_language, release_date, runtime_minutes, tmdb_popularity, title_es, title_en, synopsis_es, synopsis_en, editorial_review_es, editorial_review_en, editorial_rating, editorial_verdict_es, editorial_verdict_en, poster_path, backdrop_path, logo_path, seo_title_es, seo_title_en, seo_description_es, seo_description_en, og_image_url, status, is_prerendered, sitemap_priority, noindex, tmdb_last_synced_at, created_at, updated_at, media_genres(genre_id)',
+                'id, tmdb_id, slug, media_type, original_title, release_date, runtime_minutes, tmdb_popularity, title_es, title_en, synopsis_es, synopsis_en, editorial_rating, poster_path, backdrop_path, status, noindex, media_genres(genre_id)',
                 { count: 'exact' }
             )
             .order(sort_by, { ascending: sort_order === 'asc', nullsFirst: false })
 
         if (status) query = query.eq('status', status)
+        // Default to draft if no status specified
+        if (!status) query = query.eq('status', 'draft')
         if (media_type) query = query.eq('media_type', media_type)
         if (noindex !== undefined) query = query.eq('noindex', noindex)
 
@@ -189,10 +220,7 @@ export const MediaService = {
 
             supabase
                 .from('media_credits')
-                .select(`
-          id, media_id, person_id, role, character_name, cast_order, department, job_title,
-          person:people(id, tmdb_id, slug, name, profile_path, tmdb_popularity, gender, sitemap_priority, created_at, updated_at)
-        `)
+                .select('id, media_id, person_id, role, character_name, cast_order, department, job_title')
                 .eq('media_id', media.id)
                 .order('cast_order', { ascending: true, nullsFirst: false }),
 
@@ -227,10 +255,7 @@ export const MediaService = {
         return {
             ...media,
             genres: (genres ?? []).map((g: any) => g.genres).filter(Boolean),
-            credits: (credits ?? []).map((c: any) => ({
-                ...c,
-                person: c.person?.[0]
-            })),
+            credits: await enrichCreditsWithPeople(credits ?? []),
             videos: (videos ?? []),
             ratings: (ratings ?? []),
             watch_providers: (providers ?? []).map((p: any) => ({
@@ -275,7 +300,7 @@ export const MediaService = {
                 { count: 'exact' }
             )
             .eq('genre_id', (genre as any).id)
-            .eq('media.status', 'published')
+            .eq('media.status', 'draft')
             .order('media(tmdb_popularity)', { ascending: false })
             .range(from, from + perPage - 1)
 
@@ -296,7 +321,6 @@ export const MediaService = {
             .from('media')
             .select('id, slug, title_es, title_en, poster_path, release_date, media_type, tmdb_popularity')
             .or(`title_es.ilike.%${q}%,title_en.ilike.%${q}%,original_title.ilike.%${q}%`)
-            .eq('status', 'published')
             .order('tmdb_popularity', { ascending: false, nullsFirst: false })
             .limit(limit)
 

@@ -21,24 +21,42 @@ export const GenresController = {
   async getBySlug(c: Context) {
     try {
       const { slug } = c.req.param()
+      console.log('[GenresController] getBySlug called with slug:', slug)
       if (!slug) return notFound(c, 'Género')
       const genre = await GenreService.findBySlug(slug)
+      console.log('[GenresController] findBySlug result:', genre)
       if (!genre) return notFound(c, 'Género')
       return ok(c, genre, 200, 'long')
     } catch (err) {
+      console.error('[GenresController] getBySlug error:', err)
       return serverError(c, err)
     }
   },
 
-  // GET /genres/:slug/media   — películas de ese género
+  // GET /genres/:slug/media   — películas de ese género con paginación y búsqueda
   async getWithMedia(c: Context) {
     try {
       const { slug } = c.req.param()
+      console.log('[GenresController] getWithMedia called with slug:', slug)
       if (!slug) return notFound(c, 'Genero')
-      const limit    = Number(c.req.query('limit') ?? 20)
-      const result   = await GenreService.findBySlugWithMedia(slug, limit)
+      const page     = Number(c.req.query('page') ?? 1)
+      const per_page = Number(c.req.query('per_page') ?? 20)
+      const search   = c.req.query('search')
+      const result   = await GenreService.findBySlugWithMedia(slug, page, per_page, search)
+      console.log('[GenresController] findBySlugWithMedia result:', result)
       if (!result) return notFound(c, 'Género')
       return ok(c, result)
+    } catch (err) {
+      console.error('[GenresController] getWithMedia error:', err)
+      return serverError(c, err)
+    }
+  },
+
+  // GET /genres/stats   — estadísticas de géneros (conteo de películas)
+  async getStats(c: Context) {
+    try {
+      const stats = await GenreService.getStats()
+      return ok(c, stats)
     } catch (err) {
       return serverError(c, err)
     }

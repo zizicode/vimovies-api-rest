@@ -36,6 +36,7 @@ export const MediaController = {
             const { slug } = c.req.param()
             if (!slug) return notFound(c, 'Película/Serie')
             const region = (c.req.query('region')) ?? 'ES'
+            
             const media = await MediaService.findBySlugFull(slug, region)
             if (!media) return notFound(c, 'Película/Serie')
             return ok(c, media, 200, 'long')
@@ -51,6 +52,7 @@ export const MediaController = {
             if (!genreSlug) return notFound(c, 'Género')
             const page = Number(c.req.query('page') ?? 1)
             const per_page = Number(c.req.query('per_page') ?? 20)
+            
             const { data, total } = await MediaService.findByGenre(genreSlug, page, per_page)
             return paginated(c, data, total, page, per_page, 'medium')
         } catch (err) {
@@ -64,6 +66,7 @@ export const MediaController = {
             const q = c.req.query('q') ?? ''
             const limit = Number(c.req.query('limit') ?? 10)
             if (!q.trim()) return ok(c, [], 200, 'short')
+            
             const results = await MediaService.search(q, limit)
             return ok(c, results, 200, 'short')
         } catch (err) {

@@ -24,6 +24,9 @@ genresRoutes.delete('/admin/:id', GenresController.remove)
 // GET /genres
 genresRoutes.get('/', GenresController.list)
 
+// GET /genres/stats
+genresRoutes.get('/stats', GenresController.getStats)
+
 // GET /genres/:slug/media
 genresRoutes.get('/:slug/media', GenresController.getWithMedia)
 

@@ -30,16 +30,21 @@ ${entries}
 </sitemapindex>`
 }
 
-const generateUrlSet = (urls: Array<{loc: string, lastmod?: string, priority?: number}>): string => {
+const generateUrlSet = (urls: Array<{loc: string, lastmod?: string, priority?: number, alternates?: {es: string, en: string}}>): string => {
   const entries = urls.map(url => `
   <url>
     <loc>${url.loc}</loc>
     ${url.lastmod ? `<lastmod>${url.lastmod}</lastmod>` : ''}
     ${url.priority ? `<priority>${url.priority}</priority>` : ''}
+    ${url.alternates ? `
+    <xhtml:link rel="alternate" hreflang="es" href="${url.alternates.es}"/>
+    <xhtml:link rel="alternate" hreflang="en" href="${url.alternates.en}"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="${url.alternates.es}"/>` : ''}
   </url>`).join('')
 
   return `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${entries}
 </urlset>`
 }
@@ -97,7 +102,11 @@ routes.get('/sitemap-peliculas.xml', async (c) => {
     const urls = items.map(item => ({
       loc: `https://vimovies.com/pelicula/${item.slug}`,
       lastmod: item.lastmod,
-      priority: item.priority
+      priority: item.priority,
+      alternates: {
+        es: `https://vimovies.com/pelicula/${item.slug}`,
+        en: `https://vimovies.com/movie/${item.slug}`
+      }
     }))
 
     const xml = generateUrlSet(urls)
@@ -139,7 +148,11 @@ routes.get('/sitemap-peliculas-en.xml', async (c) => {
     const urls = items.map(item => ({
       loc: `https://vimovies.com/movie/${item.slug}`,
       lastmod: item.lastmod,
-      priority: item.priority
+      priority: item.priority,
+      alternates: {
+        es: `https://vimovies.com/pelicula/${item.slug}`,
+        en: `https://vimovies.com/movie/${item.slug}`
+      }
     }))
 
     const xml = generateUrlSet(urls)
