@@ -33,6 +33,9 @@ mediaRoutes.post('/admin/:id/genres', MediaController.syncGenres)
 // POST /admin/media/:id/videos
 mediaRoutes.post('/admin/:id/videos', MediaController.syncVideos)
 
+// POST /admin/media/:id/faqs
+mediaRoutes.post('/admin/:id/faqs', MediaController.syncFaqs)
+
 // GET /admin/media/:id/videos/list
 mediaRoutes.get('/admin/:id/videos/list', MediaVideosController.getVideos)
 

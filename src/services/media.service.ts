@@ -69,7 +69,7 @@ export const MediaService = {
             let query = supabase
                 .from('media')
                 .select(
-                    'id, tmdb_id, slug, media_type, original_title, release_date, runtime_minutes, tmdb_popularity, title_es, title_en, synopsis_es, synopsis_en, editorial_rating, poster_path, backdrop_path, status, noindex, media_genres(genre_id)',
+                    'id, tmdb_id, slug, media_type, original_title, release_date, runtime_minutes, tmdb_popularity, title_es, title_en, synopsis_es, synopsis_en, editorial_rating, editorial_verdict_es, editorial_verdict_en, editorial_review_es, editorial_review_en, poster_path, backdrop_path, status, noindex, media_genres(genre_id)',
                     { count: 'exact' }
                 )
                 .in('id', mediaIds)
@@ -133,7 +133,7 @@ export const MediaService = {
         let query = supabase
             .from('media')
             .select(
-                'id, tmdb_id, slug, media_type, original_title, release_date, runtime_minutes, tmdb_popularity, title_es, title_en, synopsis_es, synopsis_en, editorial_rating, poster_path, backdrop_path, status, noindex, media_genres(genre_id)',
+                'id, tmdb_id, slug, media_type, original_title, release_date, runtime_minutes, tmdb_popularity, title_es, title_en, synopsis_es, synopsis_en, editorial_rating, editorial_verdict_es, editorial_verdict_en, editorial_review_es, editorial_review_en, poster_path, backdrop_path, status, noindex, media_genres(genre_id)',
                 { count: 'exact' }
             )
             .order(sort_by, { ascending: sort_order === 'asc', nullsFirst: false })

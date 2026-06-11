@@ -3,6 +3,7 @@ import type { Context } from 'hono'
 import { ContentStatus, MediaType, SitemapPriority } from '@/enums'
 import { MediaService } from '@/services/media.service'
 import { notFound, ok, paginated, serverError } from '@/utils'
+import { supabase } from '@/config/supabase'
 
 export const MediaController = {
     // Get /media
@@ -24,7 +25,21 @@ export const MediaController = {
             if (media_type) filters.media_type = media_type
 
             const { data, total } = await MediaService.findAll(filters)
-            return paginated(c, data, total, page, per_page, 'medium')
+
+            // Cargar FAQs para cada película
+            const { MediaFaqsService } = await import('@/services/media-faqs.service')
+
+            const mediaWithFaqs = await Promise.all(
+                data.map(async (media: any) => {
+                    const faqs = await MediaFaqsService.getFaqs(media.id)
+                    return {
+                        ...media,
+                        faqs: faqs || []
+                    }
+                })
+            )
+
+            return paginated(c, mediaWithFaqs, total, page, per_page, 'medium')
         } catch (err) {
             return serverError(c, err)
         }
@@ -36,10 +51,33 @@ export const MediaController = {
             const { slug } = c.req.param()
             if (!slug) return notFound(c, 'Película/Serie')
             const region = (c.req.query('region')) ?? 'ES'
-            
+
+            // Obtener media con todas las relaciones (incluye FAQs de findBySlugFull)
             const media = await MediaService.findBySlugFull(slug, region)
             if (!media) return notFound(c, 'Película/Serie')
-            return ok(c, media, 200, 'long')
+
+            // Sobrescribir solo videos y watch providers (FAQs ya vienen de findBySlugFull)
+            const [
+                { MediaVideosService },
+                { MediaWatchProvidersService },
+            ] = await Promise.all([
+                import('@/services/media-videos.service'),
+                import('@/services/media-watch-providers.service'),
+            ])
+
+            const [videos, watchProviders] = await Promise.all([
+                MediaVideosService.getVideos(media.id),
+                MediaWatchProvidersService.getWatchProviders(media.id, region),
+            ])
+
+            const mediaWithRelations = {
+                ...media,
+                videos,
+                watch_providers: watchProviders,
+                faqs: media.faqs || [], // Asegurar que faqs siempre sea un array
+            }
+
+            return ok(c, mediaWithRelations, 200, 'long')
         } catch (err) {
             return serverError(c, err)
         }
@@ -52,9 +90,23 @@ export const MediaController = {
             if (!genreSlug) return notFound(c, 'Género')
             const page = Number(c.req.query('page') ?? 1)
             const per_page = Number(c.req.query('per_page') ?? 20)
-            
+
             const { data, total } = await MediaService.findByGenre(genreSlug, page, per_page)
-            return paginated(c, data, total, page, per_page, 'medium')
+
+            // Cargar FAQs para cada película
+            const { MediaFaqsService } = await import('@/services/media-faqs.service')
+
+            const mediaWithFaqs = await Promise.all(
+                data.map(async (media: any) => {
+                    const faqs = await MediaFaqsService.getFaqs(media.id)
+                    return {
+                        ...media,
+                        faqs: faqs || []
+                    }
+                })
+            )
+
+            return paginated(c, mediaWithFaqs, total, page, per_page, 'medium')
         } catch (err) {
             return serverError(c, err)
         }
@@ -66,9 +118,23 @@ export const MediaController = {
             const q = c.req.query('q') ?? ''
             const limit = Number(c.req.query('limit') ?? 10)
             if (!q.trim()) return ok(c, [], 200, 'short')
-            
+
             const results = await MediaService.search(q, limit)
-            return ok(c, results, 200, 'short')
+
+            // Cargar FAQs para cada resultado
+            const { MediaFaqsService } = await import('@/services/media-faqs.service')
+
+            const resultsWithFaqs = await Promise.all(
+                results.map(async (media: any) => {
+                    const faqs = await MediaFaqsService.getFaqs(media.id)
+                    return {
+                        ...media,
+                        faqs: faqs || []
+                    }
+                })
+            )
+
+            return ok(c, resultsWithFaqs, 200, 'short')
         } catch (err) {
             return serverError(c, err)
         }
@@ -100,7 +166,21 @@ export const MediaController = {
             if (sort_order !== undefined) filters.sort_order = sort_order
 
             const { data, total } = await MediaService.findAll(filters)
-            return paginated(c, data, total, page, per_page, 'medium')
+
+            // Cargar FAQs para cada película
+            const { MediaFaqsService } = await import('@/services/media-faqs.service')
+
+            const mediaWithFaqs = await Promise.all(
+                data.map(async (media: any) => {
+                    const faqs = await MediaFaqsService.getFaqs(media.id)
+                    return {
+                        ...media,
+                        faqs: faqs || []
+                    }
+                })
+            )
+
+            return paginated(c, mediaWithFaqs, total, page, per_page, 'medium')
         } catch (err) {
             return serverError(c, err)
         }
@@ -111,9 +191,35 @@ export const MediaController = {
         try {
             const { id } = c.req.param()
             if (!id) return notFound(c, 'Película/Serie')
+
             const media = await MediaService.findById(id)
             if (!media) return notFound(c, 'Película/Serie')
-            return ok(c, media, 200, 'long')
+
+            // Cargar relaciones por separado
+            const [
+                { MediaVideosService },
+                { MediaWatchProvidersService },
+                { MediaFaqsService },
+            ] = await Promise.all([
+                import('@/services/media-videos.service'),
+                import('@/services/media-watch-providers.service'),
+                import('@/services/media-faqs.service'),
+            ])
+
+            const [videos, watchProviders, faqs] = await Promise.all([
+                MediaVideosService.getVideos(media.id),
+                MediaWatchProvidersService.getWatchProviders(media.id),
+                MediaFaqsService.getFaqs(media.id),
+            ])
+
+            const mediaWithRelations = {
+                ...media,
+                videos,
+                watch_providers: watchProviders,
+                faqs: faqs || [], // Asegurar que faqs siempre sea un array
+            }
+
+            return ok(c, mediaWithRelations, 200, 'long')
         } catch (err) {
             return serverError(c, err)
         }
@@ -248,5 +354,43 @@ export const MediaController = {
     } catch (err) {
         return serverError(c, err)
     }
-}
+},
+
+    // POST /admin/media/:id/faqs
+    async syncFaqs(c: Context) {
+        try {
+            const { id } = c.req.param()
+            if (!id) return notFound(c, 'Película/Serie')
+
+            const faqs = await c.req.json()
+
+            // Primero eliminar FAQs existentes
+            await supabase
+                .from('article_faqs')
+                .delete()
+                .eq('media_id', id)
+
+            // Insertar nuevas FAQs
+            if (faqs && Array.isArray(faqs) && faqs.length > 0) {
+                const faqsWithMediaId = faqs.map((faq: any, index: number) => ({
+                    media_id: id,
+                    question_es: faq.question_es || null,
+                    question_en: faq.question_en || null,
+                    answer_es: faq.answer_es || null,
+                    answer_en: faq.answer_en || null,
+                    display_order: faq.display_order !== undefined ? faq.display_order : index
+                }))
+
+                const { error } = await supabase
+                    .from('article_faqs')
+                    .insert(faqsWithMediaId)
+
+                if (error) throw error
+            }
+
+            return ok(c, { message: 'FAQs sincronizadas correctamente' })
+        } catch (err) {
+            return serverError(c, err)
+        }
+    }
 }
