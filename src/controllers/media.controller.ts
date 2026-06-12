@@ -67,7 +67,7 @@ export const MediaController = {
 
             const [videos, watchProviders] = await Promise.all([
                 MediaVideosService.getVideos(media.id),
-                MediaWatchProvidersService.getWatchProviders(media.id, region),
+                MediaWatchProvidersService.getWatchProviders(media.id),
             ])
 
             const mediaWithRelations = {
@@ -200,16 +200,19 @@ export const MediaController = {
                 { MediaVideosService },
                 { MediaWatchProvidersService },
                 { MediaFaqsService },
+                { MediaCreditsService },
             ] = await Promise.all([
                 import('@/services/media-videos.service'),
                 import('@/services/media-watch-providers.service'),
                 import('@/services/media-faqs.service'),
+                import('@/services/media-credit.service'),
             ])
 
-            const [videos, watchProviders, faqs] = await Promise.all([
+            const [videos, watchProviders, faqs, credits] = await Promise.all([
                 MediaVideosService.getVideos(media.id),
                 MediaWatchProvidersService.getWatchProviders(media.id),
                 MediaFaqsService.getFaqs(media.id),
+                MediaCreditsService.getCredits(media.id),
             ])
 
             const mediaWithRelations = {
@@ -217,6 +220,7 @@ export const MediaController = {
                 videos,
                 watch_providers: watchProviders,
                 faqs: faqs || [], // Asegurar que faqs siempre sea un array
+                credits: credits || [], // Asegurar que credits siempre sea un array
             }
 
             return ok(c, mediaWithRelations, 200, 'long')

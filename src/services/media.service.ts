@@ -4,7 +4,7 @@ import { Media, MediaDetail, MediaFilters, MediaListResult, PatchMediaInput, Syn
 /**
  * Enriquece los créditos con los datos de las personas
  */
-async function enrichCreditsWithPeople(credits: any[]): Promise<any[]> {
+export async function enrichCreditsWithPeople(credits: any[]): Promise<any[]> {
     if (credits.length === 0) return []
 
     // Obtener todos los person_id únicos
