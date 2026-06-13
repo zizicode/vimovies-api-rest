@@ -7,35 +7,44 @@ import { GenreService } from '../services/genres.service'
 import { MediaService } from '../services/media.service'
 import { htmlWithCache } from '../utils/response'
 import '../types/hono.type'
+import { buildStaticBody, buildStaticRenderMeta } from '@/render/static.render'
 
 const routes = new Hono()
 
 // ── Plantilla HTML Base ───────────────────────────────────────
 
-const baseHtml = (title: string, description: string, ogData: any, schema: any, body: string, locale: SupportedLocale = DEFAULT_LOCALE, alternates?: { es: string; en: string }) => `
+const baseHtml = (title: string, description: string, canonical: string, og: any, twitter: any, alternates: { es: string; en: string }, schema: any, body: string, locale: SupportedLocale = DEFAULT_LOCALE) => `
 <!DOCTYPE html>
 <html lang="${locale}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title}</title>
-  <meta name="description" content="${description}">
-  <meta property="og:title" content="${ogData.title}">
-  <meta property="og:description" content="${ogData.description}">
-  <meta property="og:image" content="${ogData.image}">
-  <meta property="og:type" content="${ogData.type}">
-  <meta property="og:url" content="${ogData.url}">
-  <meta property="og:locale" content="${locale === 'es' ? 'es_ES' : 'en_US'}">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="${ogData.title}">
-  <meta name="twitter:description" content="${ogData.description}">
-  <meta name="twitter:image" content="${ogData.image}">
-  <link rel="canonical" href="${ogData.url}">
-  ${alternates ? `
-  <link rel="alternate" hreflang="es" href="${alternates.es}">
-  <link rel="alternate" hreflang="en" href="${alternates.en}">
-  <link rel="alternate" hreflang="x-default" href="${alternates.es}">
-  ` : ''}
+  
+<!-- Primary -->
+<title>${title}</title>
+<meta name="description" content="${description}">
+<link rel="canonical" href="${canonical}">
+
+<!-- Open Graph -->
+<meta property="og:type"        content="${og.type}">
+<meta property="og:site_name"   content="${og.site_name}">
+<meta property="og:title"       content="${og.title}">
+<meta property="og:description" content="${og.description}">
+<meta property="og:image"       content="${og.image}">
+<meta property="og:url"         content="${og.url}">
+
+<!-- Twitter / X -->
+<meta name="twitter:card"        content="${twitter.card}">
+<meta name="twitter:site"        content="${twitter.site}">
+<meta name="twitter:title"       content="${twitter.title}">
+<meta name="twitter:description" content="${twitter.description}">
+<meta name="twitter:image"       content="${twitter.image}">
+
+<!-- hreflang -->
+<link rel="alternate" hreflang="es" href="${alternates.es}">
+<link rel="alternate" hreflang="en" href="${alternates.en}">
+<link rel="alternate" hreflang="x-default" href="${alternates.en}">
+
   <script type="application/ld+json">${JSON.stringify(schema)}</script>
 </head>
 <body>${body}</body>
@@ -158,7 +167,13 @@ async function renderEnglishMirror(
       const schema = movieSchema(media, locale)
       const body = `<main><article><h1>${title}</h1><p>${description}</p></article></main>`
 
-      html = baseHtml(title, description, ogData, schema, body, locale, alternates)
+      html = baseHtml(title, description, ogData.url, ogData, {
+        card: 'summary_large_image',
+        site: '@vimovies',
+        title: ogData.title,
+        description: ogData.description,
+        image: ogData.image
+      }, alternates, schema, body, locale)
     }
     // Series
     else if (spanishSection === 'serie') {
@@ -184,7 +199,13 @@ async function renderEnglishMirror(
       const schema = tvSeriesSchema(media, locale)
       const body = `<main><article><h1>${title}</h1><p>${description}</p></article></main>`
 
-      html = baseHtml(title, description, ogData, schema, body, locale, alternates)
+      html = baseHtml(title, description, ogData.url, ogData, {
+        card: 'summary_large_image',
+        site: '@vimovies',
+        title: ogData.title,
+        description: ogData.description,
+        image: ogData.image
+      }, alternates, schema, body, locale)
     }
     // Artículos
     else if (spanishSection === 'articulo') {
@@ -210,7 +231,13 @@ async function renderEnglishMirror(
       const schema = articleSchema(article)
       const body = `<main><article><h1>${title}</h1><p>${description}</p></article></main>`
 
-      html = baseHtml(title, description, ogData, schema, body, locale, alternates)
+      html = baseHtml(title, description, ogData.url, ogData, {
+        card: 'summary_large_image',
+        site: '@vimovies',
+        title: ogData.title,
+        description: ogData.description,
+        image: ogData.image
+      }, alternates, schema, body, locale)
     }
     // Géneros
     else if (spanishSection === 'genero') {
@@ -236,7 +263,13 @@ async function renderEnglishMirror(
       const schema = itemListSchema({ title, description, slug: genre.slug, items: [] })
       const body = `<main><section><h1>${genre.name_en}</h1><p>${description}</p></section></main>`
 
-      html = baseHtml(title, description, ogData, schema, body, locale, alternates)
+      html = baseHtml(title, description, ogData.url, ogData, {
+        card: 'summary_large_image',
+        site: '@vimovies',
+        title: ogData.title,
+        description: ogData.description,
+        image: ogData.image
+      }, alternates, schema, body, locale)
     }
     // Rankings/Lists
     else if (spanishSection === 'ranking') {
@@ -262,7 +295,13 @@ async function renderEnglishMirror(
       const schema = itemListSchema(list)
       const body = `<main><section><h1>${title}</h1><p>${description}</p></section></main>`
 
-      html = baseHtml(title, description, ogData, schema, body, locale, alternates)
+      html = baseHtml(title, description, ogData.url, ogData, {
+        card: 'summary_large_image',
+        site: '@vimovies',
+        title: ogData.title,
+        description: ogData.description,
+        image: ogData.image
+      }, alternates, schema, body, locale)
     }
     else {
       return htmlWithCache(c, notFoundHtml(), 'none')
@@ -336,10 +375,15 @@ routes.get('/*', async (c) => {
   const locale = c.get('locale') || DEFAULT_LOCALE
   const region = c.req.query('region') ?? 'ES'
 
+  let seo_title_es = "Vimovies - Ver Peliculas Online HD"
+  let seo_title_en = "Vimovies - Watch Movies Online in HD"
+  let seo_description_es = "Descubre dónde ver películas y series online, consulta sinopsis, reparto, críticas, calificaciones, rankings y las últimas noticias del cine y el streaming. Encuentra información actualizada sobre tus títulos favoritos en Vimovies."
+  let seo_description_en = "Discover where to watch movies and TV shows online, check synopses, cast lists, reviews, ratings, rankings, and the latest news about film and streaming. Find up-to-date information about your favorite titles on Vimovies."
+
   // Si la ruta está vacía después de quitar /render, mostrar página de inicio
   if (pathParts.length === 0) {
-    const title = 'Vimovies — Tu guía definitiva de cine y series'
-    const description = 'Descubre dónde ver tus películas y series favoritas, consulta críticas, rankings y noticias del mundo del cine en Vimovies.'
+    const title = region !== 'EN' ? seo_title_es : seo_title_en
+    const description = region !== 'EN' ? seo_description_es : seo_description_en
     const canonical = 'https://vimovies.com/'
     const ogData = {
       title,
@@ -360,17 +404,50 @@ routes.get('/*', async (c) => {
         url: canonical
       }
     }
+    const alternates = {
+      es: 'https://vimovies.com/',
+      en: 'https://vimovies.com/en'
+    }
     const body = `
 <main>
   <section>
-    <h1>Vimovies — Tu guía definitiva de cine y series</h1>
-    <p>Descubre dónde ver tus películas y series favoritas, consulta críticas, rankings y noticias del mundo del cine en Vimovies.</p>
+    <h1>${region !== 'EN' ? seo_title_es : seo_title_en}</h1>
+    <p>${region !== 'EN' ? seo_description_es : seo_description_en}</p>
   </section>
 </main>`
 
-    const html = baseHtml(title, description, ogData, schema, body, locale)
+    const html = baseHtml(title, description, ogData.url, ogData, {
+      card: 'summary_large_image',
+      site: '@vimovies',
+      title: ogData.title,
+      description: ogData.description,
+      image: ogData.image
+    }, alternates, schema, body, locale)
     return htmlWithCache(c, html, 'long')
   }
+
+  if (pathParts.length === 1) {
+  const meta = buildStaticRenderMeta(pathParts[0]!, locale)
+
+  if (meta) {
+    const body = buildStaticBody(meta.title, meta.description)
+    return htmlWithCache(
+      c,
+      baseHtml(
+        meta.title,
+        meta.description,
+        meta.og.url,
+        meta.og,
+        meta.twitter,
+        meta.alternates,
+        meta.schema,
+        body,
+        locale
+      ),
+      'long'
+    )
+  }
+}
 
   const [section, slug] = pathParts
 
@@ -410,38 +487,13 @@ routes.get('/*', async (c) => {
       const schema = movieSchema(media, locale)
       const body = `<main><article><h1>${title}</h1><p>${description}</p></article></main>`
 
-      return htmlWithCache(c, baseHtml(title, description, ogData, schema, body, locale, alternates), 'long')
-    }
-
-    // Series
-    if (section === 'serie' && slug) {
-      console.log(`[Render] Looking for series with slug: ${slug}`)
-      const media = await MediaService.findBySlugFull(slug)
-      console.log(`[Render] Found media:`, media ? `${media.title_es || media.title_en} (type: ${media.media_type})` : 'null')
-      
-      if (media?.media_type !== 'series') {
-        console.log(`[Render] Series not found or wrong type. media_type: ${media?.media_type}, expected: series`)
-        return htmlWithCache(c, notFoundHtml(), 'none')
-      }
-
-      const title = media.seo_title_es || media.title_es || media.original_title
-      const description = media.seo_description_es || media.synopsis_es || media.synopsis_en || ''
-      const canonical = `https://vimovies.com/serie/${media.slug}`
-      const ogData = {
-        title,
-        description,
-        image: media.poster_path ? `https://image.tmdb.org/t/p/w780${media.poster_path}` : '',
-        type: 'video.tv_show',
-        url: canonical
-      }
-      const alternates = {
-        es: `https://vimovies.com/serie/${media.slug}`,
-        en: `https://vimovies.com/tv-show/${media.slug}`
-      }
-      const schema = tvSeriesSchema(media)
-      const body = `<main><article><h1>${title}</h1><p>${description}</p></article></main>`
-
-      return htmlWithCache(c, baseHtml(title, description, ogData, schema, body, locale, alternates), 'long')
+      return htmlWithCache(c, baseHtml(title, description, ogData.url, ogData, {
+        card: 'summary_large_image',
+        site: '@vimovies',
+        title: ogData.title,
+        description: ogData.description,
+        image: ogData.image
+      }, alternates, schema, body, locale), 'long')
     }
 
     // Artículos
@@ -468,7 +520,13 @@ routes.get('/*', async (c) => {
       const schema = articleSchema(article)
       const body = `<main><article><h1>${title}</h1><p>${description}</p></article></main>`
 
-      return htmlWithCache(c, baseHtml(title, description, ogData, schema, body, locale, alternates), 'long')
+      return htmlWithCache(c, baseHtml(title, description, ogData.url, ogData, {
+        card: 'summary_large_image',
+        site: '@vimovies',
+        title: ogData.title,
+        description: ogData.description,
+        image: ogData.image
+      }, alternates, schema, body, locale), 'long')
     }
 
     // Géneros
@@ -495,7 +553,13 @@ routes.get('/*', async (c) => {
       const schema = itemListSchema({ title, description, slug: genre.slug, items: [] })
       const body = `<main><section><h1>${genre.name_es}</h1><p>${description}</p></section></main>`
 
-      return htmlWithCache(c, baseHtml(title, description, ogData, schema, body, locale, alternates), 'long')
+      return htmlWithCache(c, baseHtml(title, description, ogData.url, ogData, {
+        card: 'summary_large_image',
+        site: '@vimovies',
+        title: ogData.title,
+        description: ogData.description,
+        image: ogData.image
+      }, alternates, schema, body, locale), 'long')
     }
 
     // Rankings
@@ -522,7 +586,13 @@ routes.get('/*', async (c) => {
       const schema = itemListSchema(list)
       const body = `<main><section><h1>${title}</h1><p>${description}</p></section></main>`
 
-      return htmlWithCache(c, baseHtml(title, description, ogData, schema, body, locale, alternates), 'long')
+      return htmlWithCache(c, baseHtml(title, description, ogData.url, ogData, {
+        card: 'summary_large_image',
+        site: '@vimovies',
+        title: ogData.title,
+        description: ogData.description,
+        image: ogData.image
+      }, alternates, schema, body, locale), 'long')
     }
 
     return htmlWithCache(c, notFoundHtml(), 'none')
