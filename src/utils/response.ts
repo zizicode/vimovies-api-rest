@@ -1,4 +1,4 @@
-import { Context } from 'hono'
+﻿import { Context } from 'hono'
 import type { ContentfulStatusCode } from 'hono/utils/http-status'
 
 // -- Tipos ----------------------------------------------------
@@ -57,15 +57,18 @@ export const serverError = (c: Context, error: unknown) => {
   return c.json({ success: false, error: message }, 500 as const, CACHE_HEADERS.none)
 }
 
-// Helper espec�fico para HTML renderizado (bots)
+// Helper específico para HTML renderizado (bots)
 export const htmlWithCache = (
   c: Context,
   html: string,
-  cache: CacheDuration = 'long'
+  cache: CacheDuration = 'long',
+  status: 200 | 404 = 200
 ) => {
   const headers = {
     ...CACHE_HEADERS[cache],
     'Content-Type': 'text/html; charset=utf-8'
   }
-  return c.html(html, 200, headers)
+  return c.html(html, status, headers)
 }
+
+

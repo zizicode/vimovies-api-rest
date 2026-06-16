@@ -28,6 +28,9 @@ platformsRoutes.post('/admin/media/:mediaId/providers/sync', PlatformsController
 // PATCH /admin/providers/:id/affiliate
 platformsRoutes.patch('/admin/providers/:id/affiliate', PlatformsController.updateAffiliate)
 
+// PATCH /admin/providers/:id/watch-url
+platformsRoutes.patch('/admin/providers/:id/watch-url', PlatformsController.updateWatchUrl)
+
 // ── Public Routes ────────────────────────────────────────────────────────
 
 // GET /platforms

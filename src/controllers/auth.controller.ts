@@ -8,8 +8,23 @@ import { verifyPassword, generateToken, HARDCODED_USERS } from '../utils/auth.ut
 
 export const loginController = async (c: Context) => {
   try {
-    const { userId, password } = await c.req.json()
-    console.log(userId)
+    const body = await c.req.text()
+    console.log('[Auth] Raw request body:', body)
+    
+    let parsed
+    try {
+      parsed = JSON.parse(body)
+    } catch (parseError) {
+      console.error('[Auth] JSON parse error:', parseError)
+      console.error('[Auth] Raw body that failed to parse:', body)
+      return c.json({
+        success: false,
+        error: 'Invalid JSON in request body'
+      }, 400)
+    }
+    
+    const { userId, password } = parsed
+    console.log('[Auth] Parsed userId:', userId)
 
     // Validar que se proporcionaron credenciales
     if (!userId || !password) {

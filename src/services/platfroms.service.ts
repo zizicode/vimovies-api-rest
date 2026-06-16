@@ -266,6 +266,22 @@ export const PlatformsService = {
     },
 
     /**
+     * Actualiza solo el watch_url de un watch provider específico.
+     * No se puede hacer desde el sync — solo desde el dashboard.
+     */
+    async updateWatchUrl(providerId: string, watchUrl: string): Promise<MediaWatchProvider> {
+        const { data, error } = await supabase
+            .from('media_watch_providers')
+            .update({ watch_url: watchUrl })
+            .eq('id', providerId)
+            .select()
+            .single()
+
+        if (error) throw error
+        return data as MediaWatchProvider
+    },
+
+    /**
      * Elimina una plataforma.
      * Cascada eliminará sus media_watch_providers.
      */

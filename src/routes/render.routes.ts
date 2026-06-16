@@ -1,4 +1,4 @@
-import { Hono } from 'hono'
+﻿import { Hono } from 'hono'
 
 import { SupportedLocale, DEFAULT_LOCALE } from '../middleware/locale.middleware'
 import { ArticlesService } from '../services/articles.service'
@@ -11,7 +11,7 @@ import { buildStaticBody, buildStaticRenderMeta } from '@/render/static.render'
 
 const routes = new Hono()
 
-// ── Plantilla HTML Base ───────────────────────────────────────
+// â”€â”€ Plantilla HTML Base â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const baseHtml = (title: string, description: string, canonical: string, og: any, twitter: any, alternates: { es: string; en: string }, schema: any, body: string, locale: SupportedLocale = DEFAULT_LOCALE) => `
 <!DOCTYPE html>
@@ -50,7 +50,7 @@ const baseHtml = (title: string, description: string, canonical: string, og: any
 <body>${body}</body>
 </html>`
 
-// ── Schema.org Generators ───────────────────────────────────
+// â”€â”€ Schema.org Generators â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const movieSchema = (media: any, locale: SupportedLocale = DEFAULT_LOCALE) => {
   const isEs = locale === 'es'
@@ -126,7 +126,7 @@ const itemListSchema = (list: any) => ({
   numberOfItems: list.items?.length || 0
 })
 
-// ── Helper para endpoints espejo en inglés ─────────────────────
+// â”€â”€ Helper para endpoints espejo en inglÃ©s â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function renderEnglishMirror(
   c: any,
@@ -143,11 +143,11 @@ async function renderEnglishMirror(
   try {
     let html: string
 
-    // Películas
+    // PelÃ­culas
     if (spanishSection === 'pelicula') {
       const media = await MediaService.findBySlugFull(slug)
       if (!media || media.media_type !== 'movie') {
-        return htmlWithCache(c, notFoundHtml(), 'none')
+        return htmlWithCache(c, notFoundHtml(), 'none', 404)
       }
 
       const title = media.seo_title_en || media.title_en || media.original_title
@@ -179,7 +179,7 @@ async function renderEnglishMirror(
     else if (spanishSection === 'serie') {
       const media = await MediaService.findBySlugFull(slug)
       if (!media || media.media_type !== 'series') {
-        return htmlWithCache(c, notFoundHtml(), 'none')
+        return htmlWithCache(c, notFoundHtml(), 'none', 404)
       }
 
       const title = media.seo_title_en || media.title_en || media.original_title
@@ -207,14 +207,14 @@ async function renderEnglishMirror(
         image: ogData.image
       }, alternates, schema, body, locale)
     }
-    // Artículos
+    // ArtÃ­culos
     else if (spanishSection === 'articulo') {
       const article = await ArticlesService.findBySlug(slug)
       if (!article) {
-        return htmlWithCache(c, notFoundHtml(), 'none')
+        return htmlWithCache(c, notFoundHtml(), 'none', 404)
       }
 
-      const title = article.seo_title_en || article.title_en || article.title_es || 'Sin título'
+      const title = article.seo_title_en || article.title_en || article.title_es || 'Sin tÃ­tulo'
       const description = article.seo_description_en || article.excerpt_en || article.excerpt_es || ''
       const canonical = `https://vimovies.com/article/${article.slug}`
       const ogData = {
@@ -239,11 +239,11 @@ async function renderEnglishMirror(
         image: ogData.image
       }, alternates, schema, body, locale)
     }
-    // Géneros
+    // GÃ©neros
     else if (spanishSection === 'genero') {
       const genre = await GenreService.findBySlug(slug)
       if (!genre) {
-        return htmlWithCache(c, notFoundHtml(), 'none')
+        return htmlWithCache(c, notFoundHtml(), 'none', 404)
       }
 
       const title = `${genre.name_en} - Movies and TV Shows`
@@ -275,7 +275,7 @@ async function renderEnglishMirror(
     else if (spanishSection === 'ranking') {
       const list = await CuratedListsService.findBySlug(slug)
       if (!list) {
-        return htmlWithCache(c, notFoundHtml(), 'none')
+        return htmlWithCache(c, notFoundHtml(), 'none', 404)
       }
 
       const title = list.seo_title_en || list.title_en || list.title_es
@@ -304,50 +304,50 @@ async function renderEnglishMirror(
       }, alternates, schema, body, locale)
     }
     else {
-      return htmlWithCache(c, notFoundHtml(), 'none')
+      return htmlWithCache(c, notFoundHtml(), 'none', 404)
     }
 
     return htmlWithCache(c, html, 'long')
 
   } catch (error) {
     console.error('[Render EN] Error:', error)
-    return htmlWithCache(c, notFoundHtml(), 'none')
+    return htmlWithCache(c, notFoundHtml(), 'none', 404)
   }
 }
 
-// ── Endpoints espejo en inglés ───────────────────────────────────
+// â”€â”€ Endpoints espejo en inglÃ©s â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-// Película en inglés
+// PelÃ­cula en inglÃ©s
 routes.get('/movie/:slug', async (c) => {
   const slug = c.req.param('slug')
   return renderEnglishMirror(c, 'movie', slug, 'pelicula', 'movie')
 })
 
-// Serie en inglés
+// Serie en inglÃ©s
 routes.get('/tv-show/:slug', async (c) => {
   const slug = c.req.param('slug')
   return renderEnglishMirror(c, 'tv-show', slug, 'serie', 'tv-show')
 })
 
-// Artículo en inglés
+// ArtÃ­culo en inglÃ©s
 routes.get('/article/:slug', async (c) => {
   const slug = c.req.param('slug')
   return renderEnglishMirror(c, 'article', slug, 'articulo', 'article')
 })
 
-// Género en inglés
+// GÃ©nero en inglÃ©s
 routes.get('/genre/:slug', async (c) => {
   const slug = c.req.param('slug')
   return renderEnglishMirror(c, 'genre', slug, 'genero', 'genre')
 })
 
-// Lista curada en inglés
+// Lista curada en inglÃ©s
 routes.get('/list/:slug', async (c) => {
   const slug = c.req.param('slug')
   return renderEnglishMirror(c, 'list', slug, 'ranking', 'list')
 })
 
-// ── HTML 404 ─────────────────────────────────────────────────
+// â”€â”€ HTML 404 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const notFoundHtml = () => `
 <!DOCTYPE html>
@@ -355,19 +355,19 @@ const notFoundHtml = () => `
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>404 — Página no encontrada | Vimovies</title>
-  <meta name="description" content="La página que buscas no existe en Vimovies.">
+  <title>404 â€” PÃ¡gina no encontrada | Vimovies</title>
+  <meta name="description" content="La pÃ¡gina que buscas no existe en Vimovies.">
 </head>
 <body>
   <main>
-    <h1>404 — Página no encontrada</h1>
-    <p>La página que buscas no existe o ha sido movida.</p>
+    <h1>404 â€” PÃ¡gina no encontrada</h1>
+    <p>La pÃ¡gina que buscas no existe o ha sido movida.</p>
     <a href="/">Ir al inicio</a>
   </main>
 </body>
 </html>`
 
-// ── Router Principal ───────────────────────────────────────────
+// â”€â”€ Router Principal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 routes.get('/*', async (c) => {
   const path = c.req.path.replace('/render', '')
@@ -377,10 +377,10 @@ routes.get('/*', async (c) => {
 
   let seo_title_es = "Vimovies - Ver Peliculas Online HD"
   let seo_title_en = "Vimovies - Watch Movies Online in HD"
-  let seo_description_es = "Descubre dónde ver películas y series online, consulta sinopsis, reparto, críticas, calificaciones, rankings y las últimas noticias del cine y el streaming. Encuentra información actualizada sobre tus títulos favoritos en Vimovies."
+  let seo_description_es = "Descubre dÃ³nde ver pelÃ­culas y series online, consulta sinopsis, reparto, crÃ­ticas, calificaciones, rankings y las Ãºltimas noticias del cine y el streaming. Encuentra informaciÃ³n actualizada sobre tus tÃ­tulos favoritos en Vimovies."
   let seo_description_en = "Discover where to watch movies and TV shows online, check synopses, cast lists, reviews, ratings, rankings, and the latest news about film and streaming. Find up-to-date information about your favorite titles on Vimovies."
 
-  // Si la ruta está vacía después de quitar /render, mostrar página de inicio
+  // Si la ruta estÃ¡ vacÃ­a despuÃ©s de quitar /render, mostrar pÃ¡gina de inicio
   if (pathParts.length === 0) {
     const title = region !== 'EN' ? seo_title_es : seo_title_en
     const description = region !== 'EN' ? seo_description_es : seo_description_en
@@ -454,7 +454,7 @@ routes.get('/*', async (c) => {
   console.log(`[Render] Request: section=${section}, slug=${slug}, locale=${locale}, region=${region}`)
 
   try {
-    // Películas
+    // PelÃ­culas
     if (section === 'pelicula' && slug) {
       console.log(`[Render] Looking for movie with slug: ${slug}`)
       const media = await MediaService.findBySlugFull(slug)
@@ -462,7 +462,7 @@ routes.get('/*', async (c) => {
       
       if (media?.media_type !== 'movie') {
         console.log(`[Render] Movie not found or wrong type. media_type: ${media?.media_type}, expected: movie`)
-        return htmlWithCache(c, notFoundHtml(), 'none')
+        return htmlWithCache(c, notFoundHtml(), 'none', 404)
       }
 
       const isEs = locale === 'es'
@@ -496,14 +496,14 @@ routes.get('/*', async (c) => {
       }, alternates, schema, body, locale), 'long')
     }
 
-    // Artículos
+    // ArtÃ­culos
     if (section === 'articulo' && slug) {
       const article = await ArticlesService.findBySlug(slug)
       if (!article) {
-        return htmlWithCache(c, notFoundHtml(), 'none')
+        return htmlWithCache(c, notFoundHtml(), 'none', 404)
       }
 
-      const title = article.seo_title_es || article.title_es || article.title_en || 'Sin título'
+      const title = article.seo_title_es || article.title_es || article.title_en || 'Sin tÃ­tulo'
       const description = article.seo_description_es || article.excerpt_es || article.excerpt_en || ''
       const canonical = `https://vimovies.com/articulo/${article.slug}`
       const ogData = {
@@ -529,15 +529,15 @@ routes.get('/*', async (c) => {
       }, alternates, schema, body, locale), 'long')
     }
 
-    // Géneros
+    // GÃ©neros
     if (section === 'genero' && slug) {
       const genre = await GenreService.findBySlug(slug)
       if (!genre) {
-        return htmlWithCache(c, notFoundHtml(), 'none')
+        return htmlWithCache(c, notFoundHtml(), 'none', 404)
       }
 
-      const title = `${genre.name_es} - Películas y Series`
-      const description = `Las mejores películas y series de ${genre.name_es}. Descubre títulos, ratings y recomendaciones.`
+      const title = `${genre.name_es} - PelÃ­culas y Series`
+      const description = `Las mejores pelÃ­culas y series de ${genre.name_es}. Descubre tÃ­tulos, ratings y recomendaciones.`
       const canonical = `https://vimovies.com/genero/${genre.slug}`
       const ogData = {
         title,
@@ -566,7 +566,7 @@ routes.get('/*', async (c) => {
     if (section === 'ranking' && slug) {
       const list = await CuratedListsService.findBySlug(slug)
       if (!list) {
-        return htmlWithCache(c, notFoundHtml(), 'none')
+        return htmlWithCache(c, notFoundHtml(), 'none', 404)
       }
 
       const title = list.seo_title_es || list.title_es
@@ -595,12 +595,46 @@ routes.get('/*', async (c) => {
       }, alternates, schema, body, locale), 'long')
     }
 
-    return htmlWithCache(c, notFoundHtml(), 'none')
+    return htmlWithCache(c, notFoundHtml(), 'none', 404)
 
   } catch (error) {
     console.error('[Render] Error:', error)
-    return htmlWithCache(c, notFoundHtml(), 'none')
+    return htmlWithCache(c, notFoundHtml(), 'none', 404)
   }
 })
 
+
+// Mapa del sitio
+routes.get('/mapa-sitio', async (c) => {
+  const locale = c.get('locale') || DEFAULT_LOCALE
+  const isEs = locale === 'es'
+  
+  const title = isEs ? 'Mapa del Sitio | Vimovies' : 'Sitemap | Vimovies'
+  const description = isEs 
+    ? 'Explora todas las secciones de Vimovies: películas, series, géneros, actores y rankings.'
+    : 'Explore all Vimovies sections: movies, TV shows, genres, actors, and rankings.'
+  
+  const canonical = 'https://vimovies.com/mapa-sitio'
+  const ogData = {
+    title,
+    description,
+    image: 'https://vimovies.com/og-image.png',
+    type: 'website',
+    url: canonical
+  }
+  
+  const body = '<main><h1>' + (isEs ? 'Mapa del Sitio' : 'Sitemap') + '</h1><p>' + description + '</p></main>'
+  
+  return htmlWithCache(c, baseHtml(title, description, canonical, ogData, {
+    card: 'summary',
+    site: '@vimovies',
+    title: ogData.title,
+    description: ogData.description,
+    image: ogData.image
+  }, { es: 'https://vimovies.com/mapa-sitio', en: 'https://vimovies.com/en/sitemap' }, {}, body, locale), 'long')
+})
+
 export default routes
+
+
+

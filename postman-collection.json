@@ -1,0 +1,2221 @@
+{
+  "info": {
+    "name": "Vimovies API Collection",
+    "description": "Complete API collection for Vimovies backend - Movies, Series, Genres, People, Platforms, Articles, Lists, Auth, Admin, SEO and more",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "vimovies-api-complete",
+    "version": {
+      "major": 1,
+      "minor": 0,
+      "patch": 0
+    }
+  },
+  "item": [
+    {
+      "name": "Health & Stats",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Basic health check endpoint"
+          },
+          "response": []
+        },
+        {
+          "name": "Public Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["stats"]
+            },
+            "description": "Public statistics for home page"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Admin Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@vimovies.com\",\n  \"password\": \"your_admin_password\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/admin/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "admin", "login"]
+            },
+            "description": "Login for administrators using hardcoded password"
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Token",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "verify"]
+            },
+            "description": "Verify if the token is valid (requires admin role)"
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout"]
+            },
+            "description": "Logout (client should delete the token)"
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "refresh"]
+            },
+            "description": "Refresh the JWT token"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Media (Movies & Series)",
+      "item": [
+        {
+          "name": "List Media",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/media?page=1&limit=20&media_type=movie",
+              "host": ["{{baseUrl}}"],
+              "path": ["media"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Items per page"
+                },
+                {
+                  "key": "media_type",
+                  "value": "movie",
+                  "description": "Filter by media type (movie/series)"
+                }
+              ]
+            },
+            "description": "Get paginated list of movies and series"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Media",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/media/search?q=batman&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["media", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "batman",
+                  "description": "Search query"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Items per page"
+                }
+              ]
+            },
+            "description": "Search movies and series by title"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Media by Genre",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/media/genre/action?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["media", "genre", "action"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Items per page"
+                }
+              ]
+            },
+            "description": "Get movies/series by genre slug"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Media by Slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/media/the-batman-2022",
+              "host": ["{{baseUrl}}"],
+              "path": ["media", "the-batman-2022"]
+            },
+            "description": "Get detailed media information by slug"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin Media",
+      "item": [
+        {
+          "name": "Admin List Media",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/media/admin?page=1&limit=50&status=published",
+              "host": ["{{baseUrl}}"],
+              "path": ["media", "admin"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "50",
+                  "description": "Items per page"
+                },
+                {
+                  "key": "status",
+                  "value": "published",
+                  "description": "Filter by status"
+                }
+              ]
+            },
+            "description": "Admin list of media with full details"
+          },
+          "response": []
+        },
+        {
+          "name": "Admin Get Media by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/media/admin/123",
+              "host": ["{{baseUrl}}"],
+              "path": ["media", "admin", "123"]
+            },
+            "description": "Get media by ID for admin (includes unpublished)"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Editorial",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"editorial_review_es\": \"Excelente película con gran actuación\",\n  \"editorial_review_en\": \"Excellent movie with great acting\",\n  \"editorial_rating\": 8.5,\n  \"editorial_verdict_es\": \"Muy recomendada\",\n  \"editorial_verdict_en\": \"Highly recommended\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/media/admin/123",
+              "host": ["{{baseUrl}}"],
+              "path": ["media", "admin", "123"]
+            },
+            "description": "Update editorial content (review, rating, verdict)"
+          },
+          "response": []
+        },
+        {
+          "name": "Patch Media",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"published\",\n  \"noindex\": false,\n  \"sitemap_priority\": \"high\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/media/admin/123/patch",
+              "host": ["{{baseUrl}}"],
+              "path": ["media", "admin", "123", "patch"]
+            },
+            "description": "Partial update of any individual field"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Media",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/media/admin/123",
+              "host": ["{{baseUrl}}"],
+              "path": ["media", "admin", "123"]
+            },
+            "description": "Delete media by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Sync Genres",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"genre_ids\": [28, 12, 80]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/media/admin/123/genres",
+              "host": ["{{baseUrl}}"],
+              "path": ["media", "admin", "123", "genres"]
+            },
+            "description": "Sync media genres"
+          },
+          "response": []
+        },
+        {
+          "name": "Sync Videos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"videos\": [\n    {\n      \"name\": \"Official Trailer\",\n      \"key\": \"dQw4w9WgXcQ\",\n      \"site\": \"YouTube\",\n      \"type\": \"Trailer\",\n      \"official\": true\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/media/admin/123/videos",
+              "host": ["{{baseUrl}}"],
+              "path": ["media", "admin", "123", "videos"]
+            },
+            "description": "Sync media videos"
+          },
+          "response": []
+        },
+        {
+          "name": "Sync FAQs",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"faqs\": [\n    {\n      \"question_es\": \"¿Cuándo se estrena la película?\",\n      \"question_en\": \"When does the movie premiere?\",\n      \"answer_es\": \"Se estrena el 15 de marzo\",\n      \"answer_en\": \"It premieres on March 15th\",\n      \"order\": 1\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/media/admin/123/faqs",
+              "host": ["{{baseUrl}}"],
+              "path": ["media", "admin", "123", "faqs"]
+            },
+            "description": "Sync media FAQs"
+          },
+          "response": []
+        },
+        {
+          "name": "Import from JSON",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"media\": [\n    {\n      \"title_es\": \"Título en español\",\n      \"title_en\": \"Title in English\",\n      \"original_title\": \"Original Title\",\n      \"media_type\": \"movie\",\n      \"release_date\": \"2024-01-01\",\n      \"runtime_minutes\": 120\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/media/admin/import",
+              "host": ["{{baseUrl}}"],
+              "path": ["media", "admin", "import"]
+            },
+            "description": "Import media from JSON data"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Genres",
+      "item": [
+        {
+          "name": "List Genres",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/genres",
+              "host": ["{{baseUrl}}"],
+              "path": ["genres"]
+            },
+            "description": "Get all genres"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Genre Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/genres/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["genres", "stats"]
+            },
+            "description": "Get genre statistics"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Genre with Media",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/genres/action/media?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["genres", "action", "media"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Items per page"
+                }
+              ]
+            },
+            "description": "Get genre details with associated media"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Genre by Slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/genres/action",
+              "host": ["{{baseUrl}}"],
+              "path": ["genres", "action"]
+            },
+            "description": "Get genre details by slug"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin Genres",
+      "item": [
+        {
+          "name": "Create Genre",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name_es\": \"Acción\",\n  \"name_en\": \"Action\",\n  \"slug\": \"accion\",\n  \"description_es\": \"Películas de acción y aventuras\",\n  \"description_en\": \"Action and adventure movies\",\n  \"seo_title_es\": \"Películas de Acción Online\",\n  \"seo_title_en\": \"Action Movies Online\",\n  \"seo_description_es\": \"Las mejores películas de acción\",\n  \"seo_description_en\": \"Best action movies\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/genres/admin",
+              "host": ["{{baseUrl}}"],
+              "path": ["genres", "admin"]
+            },
+            "description": "Create new genre"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Genre",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description_es\": \"Descripción actualizada\",\n  \"seo_title_es\": \"Título SEO actualizado\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/genres/admin/123",
+              "host": ["{{baseUrl}}"],
+              "path": ["genres", "admin", "123"]
+            },
+            "description": "Update genre by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Genre",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/genres/admin/123",
+              "host": ["{{baseUrl}}"],
+              "path": ["genres", "admin", "123"]
+            },
+            "description": "Delete genre by ID"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "People (Actors, Directors)",
+      "item": [
+        {
+          "name": "List People",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/people?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["people"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Items per page"
+                }
+              ]
+            },
+            "description": "Get list of people (for sitemap)"
+          },
+          "response": []
+        },
+        {
+          "name": "Search People",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/people/search?q=robert&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["people", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "robert",
+                  "description": "Search query"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Items per page"
+                }
+              ]
+            },
+            "description": "Search people by name"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Person by Slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/people/robert-pattinson",
+              "host": ["{{baseUrl}}"],
+              "path": ["people", "robert-pattinson"]
+            },
+            "description": "Get person details by slug"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin People",
+      "item": [
+        {
+          "name": "Admin List People",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/people/admin?page=1&limit=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["people", "admin"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "50",
+                  "description": "Items per page"
+                }
+              ]
+            },
+            "description": "Admin list of people with full details"
+          },
+          "response": []
+        },
+        {
+          "name": "Admin Get Person by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/people/admin/123",
+              "host": ["{{baseUrl}}"],
+              "path": ["people", "admin", "123"]
+            },
+            "description": "Get person by ID for admin"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Person",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"biography_es\": \"Biografía actualizada en español\",\n  \"biography_en\": \"Updated biography in English\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/people/admin/123",
+              "host": ["{{baseUrl}}"],
+              "path": ["people", "admin", "123"]
+            },
+            "description": "Update person by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Person",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/people/admin/123",
+              "host": ["{{baseUrl}}"],
+              "path": ["people", "admin", "123"]
+            },
+            "description": "Delete person by ID"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Platforms (Streaming)",
+      "item": [
+        {
+          "name": "List Platforms",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/platforms",
+              "host": ["{{baseUrl}}"],
+              "path": ["platforms"]
+            },
+            "description": "Get all streaming platforms"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Platform by Slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/platforms/netflix",
+              "host": ["{{baseUrl}}"],
+              "path": ["platforms", "netflix"]
+            },
+            "description": "Get platform details by slug"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin Platforms",
+      "item": [
+        {
+          "name": "Admin List Platforms",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/platforms/admin",
+              "host": ["{{baseUrl}}"],
+              "path": ["platforms", "admin"]
+            },
+            "description": "Admin list of platforms"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Platform",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name_es\": \"Netflix\",\n  \"name_en\": \"Netflix\",\n  \"slug\": \"netflix\",\n  \"logo_path\": \"/logos/netflix.png\",\n  \"description_es\": \"Plataforma de streaming\",\n  \"description_en\": \"Streaming platform\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/platforms/admin",
+              "host": ["{{baseUrl}}"],
+              "path": ["platforms", "admin"]
+            },
+            "description": "Create new platform"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Platform",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description_es\": \"Descripción actualizada\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/platforms/admin/123",
+              "host": ["{{baseUrl}}"],
+              "path": ["platforms", "admin", "123"]
+            },
+            "description": "Update platform by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Platform",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/platforms/admin/123",
+              "host": ["{{baseUrl}}"],
+              "path": ["platforms", "admin", "123"]
+            },
+            "description": "Delete platform by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Sync Providers for Media",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"providers\": [\n    {\n      \"platform_id\": 1,\n      \"region\": \"ES\",\n      \"display_priority\": 1\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/platforms/admin/media/123/providers/sync",
+              "host": ["{{baseUrl}}"],
+              "path": ["platforms", "admin", "media", "123", "providers", "sync"]
+            },
+            "description": "Sync watch providers for specific media"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Affiliate",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"affiliate_url_es\": \"https://affiliate.es/netflix\",\n  \"affiliate_url_en\": \"https://affiliate.com/netflix\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/platforms/admin/providers/123/affiliate",
+              "host": ["{{baseUrl}}"],
+              "path": ["platforms", "admin", "providers", "123", "affiliate"]
+            },
+            "description": "Update affiliate URLs for provider"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Watch URL",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"watch_url\": \"https://repelishd.ceo/ver-pelicula/1234-movie-online-espanol.html\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/platforms/admin/providers/123/watch-url",
+              "host": ["{{baseUrl}}"],
+              "path": ["platforms", "admin", "providers", "123", "watch-url"]
+            },
+            "description": "Update watch_url for a specific provider (used by bot)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Articles (SEO Content)",
+      "item": [
+        {
+          "name": "List Articles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/articles?page=1&limit=20&status=published",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Items per page"
+                },
+                {
+                  "key": "status",
+                  "value": "published",
+                  "description": "Filter by status"
+                }
+              ]
+            },
+            "description": "Get list of articles"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Article by Slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/articles/mejores-peliculas-2024",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles", "mejores-peliculas-2024"]
+            },
+            "description": "Get article details by slug"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin Articles",
+      "item": [
+        {
+          "name": "Get All Tags",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/articles/admin/tags",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles", "admin", "tags"]
+            },
+            "description": "Get all available tags"
+          },
+          "response": []
+        },
+        {
+          "name": "Seed Tags",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/articles/admin/tags/seed",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles", "admin", "tags", "seed"]
+            },
+            "description": "Seed initial tags"
+          },
+          "response": []
+        },
+        {
+          "name": "Admin List Articles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/articles/admin?page=1&limit=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles", "admin"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "50",
+                  "description": "Items per page"
+                }
+              ]
+            },
+            "description": "Admin list of articles"
+          },
+          "response": []
+        },
+        {
+          "name": "Admin Get Article by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/articles/admin/123",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles", "admin", "123"]
+            },
+            "description": "Get article by ID for admin"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Article",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title_es\": \"Las mejores películas de 2024\",\n  \"title_en\": \"Best movies of 2024\",\n  \"slug\": \"mejores-peliculas-2024\",\n  \"content_es\": \"Contenido del artículo en español...\",\n  \"content_en\": \"Article content in English...\",\n  \"excerpt_es\": \"Resumen en español\",\n  \"excerpt_en\": \"Excerpt in English\",\n  \"seo_title_es\": \"Mejores Películas 2024 | Vimovies\",\n  \"seo_title_en\": \"Best Movies 2024 | Vimovies\",\n  \"seo_description_es\": \"Descubre las mejores películas de 2024\",\n  \"seo_description_en\": \"Discover the best movies of 2024\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/articles/admin",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles", "admin"]
+            },
+            "description": "Create new article"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Article",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content_es\": \"Contenido actualizado\",\n  \"seo_title_es\": \"Título SEO actualizado\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/articles/admin/123",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles", "admin", "123"]
+            },
+            "description": "Update article by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Publish Article",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/articles/admin/123/publish",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles", "admin", "123", "publish"]
+            },
+            "description": "Publish article"
+          },
+          "response": []
+        },
+        {
+          "name": "Archive Article",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/articles/admin/123/archive",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles", "admin", "123", "archive"]
+            },
+            "description": "Archive article"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Article",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/articles/admin/123",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles", "admin", "123"]
+            },
+            "description": "Delete article by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Create FAQ",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question_es\": \"¿Qué es este artículo?\",\n  \"question_en\": \"What is this article about?\",\n  \"answer_es\": \"Este artículo trata sobre...\",\n  \"answer_en\": \"This article is about...\",\n  \"order\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/articles/admin/123/faqs",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles", "admin", "123", "faqs"]
+            },
+            "description": "Create FAQ for article"
+          },
+          "response": []
+        },
+        {
+          "name": "Update FAQ",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answer_es\": \"Respuesta actualizada\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/articles/admin/faqs/456",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles", "admin", "faqs", "456"]
+            },
+            "description": "Update FAQ by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete FAQ",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/articles/admin/faqs/456",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles", "admin", "faqs", "456"]
+            },
+            "description": "Delete FAQ by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Sync Mentions",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"media_mentions\": [1, 2, 3],\n  \"people_mentions\": [4, 5, 6]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/articles/admin/123/mentions",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles", "admin", "123", "mentions"]
+            },
+            "description": "Sync article mentions (media and people)"
+          },
+          "response": []
+        },
+        {
+          "name": "Sync Tags",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tag_names\": [\"acción\", \"aventura\", \"2024\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/articles/admin/123/tags",
+              "host": ["{{baseUrl}}"],
+              "path": ["articles", "admin", "123", "tags"]
+            },
+            "description": "Sync article tags"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Curated Lists (Rankings)",
+      "item": [
+        {
+          "name": "List Curated Lists",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/lists?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["lists"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Items per page"
+                }
+              ]
+            },
+            "description": "Get list of curated lists"
+          },
+          "response": []
+        },
+        {
+          "name": "Get List by Slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/lists/mejores-peliculas-accion",
+              "host": ["{{baseUrl}}"],
+              "path": ["lists", "mejores-peliculas-accion"]
+            },
+            "description": "Get curated list details by slug"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin Curated Lists",
+      "item": [
+        {
+          "name": "Create Curated List",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title_es\": \"Mejores Películas de Acción\",\n  \"title_en\": \"Best Action Movies\",\n  \"slug\": \"mejores-peliculas-accion\",\n  \"description_es\": \"Las mejores películas de acción de todos los tiempos\",\n  \"description_en\": \"The best action movies of all time\",\n  \"seo_title_es\": \"Mejores Películas de Acción | Vimovies\",\n  \"seo_title_en\": \"Best Action Movies | Vimovies\",\n  \"seo_description_es\": \"Descubre las mejores películas de acción\",\n  \"seo_description_en\": \"Discover the best action movies\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lists/admin",
+              "host": ["{{baseUrl}}"],
+              "path": ["lists", "admin"]
+            },
+            "description": "Create new curated list"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Curated List",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description_es\": \"Descripción actualizada\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lists/admin/123",
+              "host": ["{{baseUrl}}"],
+              "path": ["lists", "admin", "123"]
+            },
+            "description": "Update curated list by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Curated List",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/lists/admin/123",
+              "host": ["{{baseUrl}}"],
+              "path": ["lists", "admin", "123"]
+            },
+            "description": "Delete curated list by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Sync List Items",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"media_id\": 1,\n      \"position\": 1,\n      \"comment_es\": \"Excelente película\",\n      \"comment_en\": \"Excellent movie\"\n    },\n    {\n      \"media_id\": 2,\n      \"position\": 2,\n      \"comment_es\": \"Gran acción\",\n      \"comment_en\": \"Great action\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lists/admin/123/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["lists", "admin", "123", "items"]
+            },
+            "description": "Sync all items in curated list"
+          },
+          "response": []
+        },
+        {
+          "name": "Add Item to List",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"media_id\": 3,\n  \"position\": 3,\n  \"comment_es\": \"Buena película\",\n  \"comment_en\": \"Good movie\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lists/admin/123/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["lists", "admin", "123", "items"]
+            },
+            "description": "Add single item to curated list"
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Item from List",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/lists/admin/123/items/456",
+              "host": ["{{baseUrl}}"],
+              "path": ["lists", "admin", "123", "items", "456"]
+            },
+            "description": "Remove item from curated list"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin Dashboard",
+      "item": [
+        {
+          "name": "Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/dashboard/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "dashboard", "stats"]
+            },
+            "description": "Get dashboard statistics"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin Sync Operations",
+      "item": [
+        {
+          "name": "Start Movie Sync",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"movieCount\": 50,\n  \"searchStrategy\": \"multiple_searches\",\n  \"minVoteAverage\": 6.0,\n  \"minVoteCount\": 100,\n  \"includeAdult\": false,\n  \"requireSpanishVersion\": true,\n  \"syncVideos\": true,\n  \"syncWatchProviders\": true,\n  \"updateExisting\": true,\n  \"preserveEditorial\": true,\n  \"delayBetweenMovies\": 500\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/sync/movies/start",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "sync", "movies", "start"]
+            },
+            "description": "Start new movie synchronization from TMDB"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sync Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/sync/movies/123/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "sync", "movies", "123", "status"]
+            },
+            "description": "Get synchronization job status"
+          },
+          "response": []
+        },
+        {
+          "name": "Pause Sync",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/sync/movies/123/pause",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "sync", "movies", "123", "pause"]
+            },
+            "description": "Pause synchronization job"
+          },
+          "response": []
+        },
+        {
+          "name": "Resume Sync",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/sync/movies/123/resume",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "sync", "movies", "123", "resume"]
+            },
+            "description": "Resume synchronization job"
+          },
+          "response": []
+        },
+        {
+          "name": "Stop Sync",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/sync/movies/123/stop",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "sync", "movies", "123", "stop"]
+            },
+            "description": "Stop synchronization job"
+          },
+          "response": []
+        },
+        {
+          "name": "List Active Syncs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/sync/movies/active",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "sync", "movies", "active"]
+            },
+            "description": "List active synchronization jobs"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sync Config",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/sync/movies/config",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "sync", "movies", "config"]
+            },
+            "description": "Get recommended synchronization configuration"
+          },
+          "response": []
+        },
+        {
+          "name": "Cleanup Sync Jobs",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/sync/movies/cleanup",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "sync", "movies", "cleanup"]
+            },
+            "description": "Clean up completed synchronization jobs"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Recent Synced",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/sync/movies/recent?limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "sync", "movies", "recent"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Number of recent items"
+                }
+              ]
+            },
+            "description": "Get recently synchronized movies"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin Export",
+      "item": [
+        {
+          "name": "Export Movies",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"filters\": {\n    \"media_type\": \"movie\",\n    \"status\": \"published\"\n  },\n  \"format\": \"json\",\n  \"include_relations\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/export/movies",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "export", "movies"]
+            },
+            "description": "Export movies from TMDB in both languages to JSON"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "SEO & Rendering",
+      "item": [
+        {
+          "name": "Render Home Page",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/render/",
+              "host": ["{{baseUrl}}"],
+              "path": ["render", ""]
+            },
+            "description": "Render home page for SEO (for bots)"
+          },
+          "response": []
+        },
+        {
+          "name": "Render Movie Page",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/render/pelicula/the-batman-2022",
+              "host": ["{{baseUrl}}"],
+              "path": ["render", "pelicula", "the-batman-2022"]
+            },
+            "description": "Render movie page for SEO"
+          },
+          "response": []
+        },
+        {
+          "name": "Render Series Page",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/render/serie/stranger-things",
+              "host": ["{{baseUrl}}"],
+              "path": ["render", "serie", "stranger-things"]
+            },
+            "description": "Render series page for SEO"
+          },
+          "response": []
+        },
+        {
+          "name": "Render Article Page",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/render/articulo/mejores-peliculas-2024",
+              "host": ["{{baseUrl}}"],
+              "path": ["render", "articulo", "mejores-peliculas-2024"]
+            },
+            "description": "Render article page for SEO"
+          },
+          "response": []
+        },
+        {
+          "name": "Render Genre Page",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/render/genero/accion",
+              "host": ["{{baseUrl}}"],
+              "path": ["render", "genero", "accion"]
+            },
+            "description": "Render genre page for SEO"
+          },
+          "response": []
+        },
+        {
+          "name": "Render Ranking Page",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/render/ranking/mejores-peliculas-accion",
+              "host": ["{{baseUrl}}"],
+              "path": ["render", "ranking", "mejores-peliculas-accion"]
+            },
+            "description": "Render curated list page for SEO"
+          },
+          "response": []
+        },
+        {
+          "name": "English Movie Mirror",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/render/movie/the-batman-2022",
+              "host": ["{{baseUrl}}"],
+              "path": ["render", "movie", "the-batman-2022"]
+            },
+            "description": "Render English version of movie page"
+          },
+          "response": []
+        },
+        {
+          "name": "English TV Show Mirror",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/render/tv-show/stranger-things",
+              "host": ["{{baseUrl}}"],
+              "path": ["render", "tv-show", "stranger-things"]
+            },
+            "description": "Render English version of series page"
+          },
+          "response": []
+        },
+        {
+          "name": "English Article Mirror",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/render/article/best-movies-2024",
+              "host": ["{{baseUrl}}"],
+              "path": ["render", "article", "best-movies-2024"]
+            },
+            "description": "Render English version of article page"
+          },
+          "response": []
+        },
+        {
+          "name": "English Genre Mirror",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/render/genre/action",
+              "host": ["{{baseUrl}}"],
+              "path": ["render", "genre", "action"]
+            },
+            "description": "Render English version of genre page"
+          },
+          "response": []
+        },
+        {
+          "name": "English List Mirror",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/render/list/best-action-movies",
+              "host": ["{{baseUrl}}"],
+              "path": ["render", "list", "best-action-movies"]
+            },
+            "description": "Render English version of curated list page"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Sitemap & SEO",
+      "item": [
+        {
+          "name": "Sitemap Index",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sitemap.xml",
+              "host": ["{{baseUrl}}"],
+              "path": ["sitemap.xml"]
+            },
+            "description": "Main sitemap index"
+          },
+          "response": []
+        },
+        {
+          "name": "Static Sitemap",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sitemap-static.xml",
+              "host": ["{{baseUrl}}"],
+              "path": ["sitemap-static.xml"]
+            },
+            "description": "Static pages sitemap"
+          },
+          "response": []
+        },
+        {
+          "name": "Movies Sitemap",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sitemap-movies.xml",
+              "host": ["{{baseUrl}}"],
+              "path": ["sitemap-movies.xml"]
+            },
+            "description": "Movies and series sitemap"
+          },
+          "response": []
+        },
+        {
+          "name": "People Sitemap",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sitemap-people.xml",
+              "host": ["{{baseUrl}}"],
+              "path": ["sitemap-people.xml"]
+            },
+            "description": "People (actors, directors) sitemap"
+          },
+          "response": []
+        },
+        {
+          "name": "Genres Sitemap",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sitemap-genres.xml",
+              "host": ["{{baseUrl}}"],
+              "path": ["sitemap-genres.xml"]
+            },
+            "description": "Genres sitemap"
+          },
+          "response": []
+        },
+        {
+          "name": "Articles Sitemap",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sitemap-articles.xml",
+              "host": ["{{baseUrl}}"],
+              "path": ["sitemap-articles.xml"]
+            },
+            "description": "Articles sitemap"
+          },
+          "response": []
+        },
+        {
+          "name": "Robots.txt",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/robots.txt",
+              "host": ["{{baseUrl}}"],
+              "path": ["robots.txt"]
+            },
+            "description": "Robots.txt file for crawlers"
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Sitemap Cache",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sitemap-refresh?token=YOUR_REFRESH_TOKEN",
+              "host": ["{{baseUrl}}"],
+              "path": ["sitemap-refresh"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "YOUR_REFRESH_TOKEN",
+                  "description": "Security token for cache refresh"
+                }
+              ]
+            },
+            "description": "Invalidate sitemap cache (requires token)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Image Proxy",
+      "item": [
+        {
+          "name": "TMDB Image Proxy",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/t/p/w500/your_image_path.jpg",
+              "host": ["{{baseUrl}}"],
+              "path": ["t", "p", "w500", "your_image_path.jpg"]
+            },
+            "description": "Proxy TMDB images for development"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Debug Routes",
+      "item": [
+        {
+          "name": "Debug Media List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/debug/media",
+              "host": ["{{baseUrl}}"],
+              "path": ["debug", "media"]
+            },
+            "description": "Debug endpoint to check media data"
+          },
+          "response": []
+        },
+        {
+          "name": "Debug Media by Slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/debug/media/the-batman-2022",
+              "host": ["{{baseUrl}}"],
+              "path": ["debug", "media", "the-batman-2022"]
+            },
+            "description": "Debug specific media by slug"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string",
+      "description": "Base URL for the API"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string",
+      "description": "JWT authentication token (set after login)"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// This script runs before each request",
+          "// You can add global pre-request logic here",
+          "// For example, setting timestamps, logging, etc."
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// This script runs after each request",
+          "// You can add global test logic here",
+          "// For example, checking response status, etc.",
+          "",
+          "pm.test(\"Status code is successful\", function () {",
+          "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+          "});"
+        ]
+      }
+    }
+  ]
+}

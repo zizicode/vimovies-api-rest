@@ -101,4 +101,16 @@ export const PlatformsController = {
       return serverError(c, err)
     }
   },
+
+  // PATCH /admin/providers/:id/watch-url
+  async updateWatchUrl(c: Context) {
+    try {
+      const { id }       = c.req.param()
+      const { watch_url } = await c.req.json()
+      const result       = await PlatformsService.updateWatchUrl(id!, watch_url)
+      return ok(c, result)
+    } catch (err) {
+      return serverError(c, err)
+    }
+  },
 }

@@ -30,7 +30,7 @@ export const HARDCODED_USERS: HardcodedUser[] = [
     id      : 'usr_002',
     name    : 'Admin One',
     role    : 'admin',
-    password: '$2b$12$yrfDP5auVOMRPwTyyrVVMO6rKEtUuSt9DoCEMogEQBYC//jYAp6ay',
+    password: '$2b$12$uGHhu5QDzTERf7LrBLbd0.DCVnABcYsIDoEW.dWZ3CmFE.RvxmBJC',
   },
   {
     id      : 'usr_003',
