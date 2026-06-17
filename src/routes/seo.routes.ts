@@ -4,6 +4,7 @@
 // ============================================================
 import { Hono } from 'hono'
 import { MediaService } from '@/services/media.service'
+import { env } from '@/config/env'
 
 const seo = new Hono()
 
@@ -52,7 +53,7 @@ seo.get('/pelicula/:slug', async (c) => {
 
   const year        = new Date(m.release_date || '').getFullYear()
   const durationISO = `PT${m.runtime_minutes}M`
-  const poster      = `https://image.tmdb.org/t/p/w780${m.poster_path}`
+  const poster      = m.poster_path ? `${env.API_BASE_URL}/t/p/w780${m.poster_path}` : ''
   const pageUrl     = `${SITE_URL}/pelicula/${m.slug}`
   const ogImage     = m.og_image_url ?? poster
 

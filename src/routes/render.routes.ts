@@ -5,9 +5,11 @@ import { ArticlesService } from '../services/articles.service'
 import { CuratedListsService } from '../services/curated-list.service'
 import { GenreService } from '../services/genres.service'
 import { MediaService } from '../services/media.service'
+import { PersonService } from '../services/persons.service'
 import { htmlWithCache } from '../utils/response'
 import '../types/hono.type'
 import { buildStaticBody, buildStaticRenderMeta } from '@/render/static.render'
+import { env } from '@/config/env'
 
 const routes = new Hono()
 
@@ -60,7 +62,7 @@ const movieSchema = (media: any, locale: SupportedLocale = DEFAULT_LOCALE) => {
     name: isEs ? (media.title_es || media.original_title) : (media.title_en || media.original_title),
     description: isEs ? (media.synopsis_es || media.synopsis_en) : (media.synopsis_en || media.synopsis_es),
     datePublished: media.release_date,
-    image: media.poster_path ? `https://image.tmdb.org/t/p/w780${media.poster_path}` : '',
+    image: media.poster_path ? `${env.API_BASE_URL}/t/p/w780${media.poster_path}` : '',
     url: `https://vimovies.com/${isEs ? 'pelicula' : 'movie'}/${media.slug}`,
     contentRating: media.editorial_rating ? `${media.editorial_rating}/10` : '',
     duration: media.runtime_minutes ? `PT${media.runtime_minutes}M` : '',
@@ -84,7 +86,7 @@ const tvSeriesSchema = (media: any, locale: SupportedLocale = DEFAULT_LOCALE) =>
     name: isEs ? (media.title_es || media.original_title) : (media.title_en || media.original_title),
     description: isEs ? (media.synopsis_es || media.synopsis_en) : (media.synopsis_en || media.synopsis_es),
     datePublished: media.release_date,
-    image: media.poster_path ? `https://image.tmdb.org/t/p/w780${media.poster_path}` : '',
+    image: media.poster_path ? `${env.API_BASE_URL}/t/p/w780${media.poster_path}` : '',
     url: `https://vimovies.com/${isEs ? 'serie' : 'tv-show'}/${media.slug}`,
     contentRating: media.editorial_rating ? `${media.editorial_rating}/10` : '',
     genre: media.genres?.map((g: any) => isEs ? g.name_es : g.name_en).filter(Boolean) || [],
@@ -98,6 +100,16 @@ const tvSeriesSchema = (media: any, locale: SupportedLocale = DEFAULT_LOCALE) =>
     })) || []
   }
 }
+
+const personSchema = (person: any) => ({
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: person.name,
+  image: person.profile_path ? `${env.API_BASE_URL}/t/p/w780${person.profile_path}` : '',
+  birthDate: person.birthdate || undefined,
+  url: `https://vimovies.com/actor/${person.slug}`,
+  jobTitle: 'Actor'
+})
 
 const articleSchema = (article: any) => ({
   '@context': 'https://schema.org',
@@ -156,9 +168,10 @@ async function renderEnglishMirror(
       const ogData = {
         title,
         description,
-        image: media.poster_path ? `https://image.tmdb.org/t/p/w780${media.poster_path}` : '',
+        image: media.poster_path ? `${env.API_BASE_URL}/t/p/w780${media.poster_path}` : '',
         type: 'video.movie',
-        url: canonical
+        url: canonical,
+        site_name: 'Vimovies'
       }
       const alternates = {
         es: `https://vimovies.com/pelicula/${media.slug}`,
@@ -188,7 +201,7 @@ async function renderEnglishMirror(
       const ogData = {
         title,
         description,
-        image: media.poster_path ? `https://image.tmdb.org/t/p/w780${media.poster_path}` : '',
+        image: media.poster_path ? `${env.API_BASE_URL}/t/p/w780${media.poster_path}` : '',
         type: 'video.tv_show',
         url: canonical
       }
@@ -303,6 +316,39 @@ async function renderEnglishMirror(
         image: ogData.image
       }, alternates, schema, body, locale)
     }
+    // Actores
+    else if (spanishSection === 'actor') {
+      const person = await PersonService.findBySlugWithFilmography(slug)
+      if (!person) {
+        return htmlWithCache(c, notFoundHtml(), 'none', 404)
+      }
+
+      const title = `${person.person.name} - Actor | Vimovies`
+      const description = `Descubre la filmografía completa, biografía y películas de ${person.person.name}. Todas sus películas y series en Vimovies.`
+      const canonical = `https://vimovies.com/actor/${person.person.slug}`
+      const ogData = {
+        title,
+        description,
+        image: person.person.profile_path ? `${env.API_BASE_URL}/t/p/w780${person.person.profile_path}` : '',
+        type: 'profile',
+        url: canonical,
+        site_name: 'Vimovies'
+      }
+      const alternates = {
+        es: `https://vimovies.com/actor/${person.person.slug}`,
+        en: `https://vimovies.com/actor/${person.person.slug}`
+      }
+      const schema = personSchema(person.person)
+      const body = `<main><article><h1>${person.person.name}</h1><p>${description}</p></article></main>`
+
+      html = baseHtml(title, description, ogData.url, ogData, {
+        card: 'summary_large_image',
+        site: '@vimovies',
+        title: ogData.title,
+        description: ogData.description,
+        image: ogData.image
+      }, alternates, schema, body, locale)
+    }
     else {
       return htmlWithCache(c, notFoundHtml(), 'none', 404)
     }
@@ -346,7 +392,11 @@ routes.get('/list/:slug', async (c) => {
   const slug = c.req.param('slug')
   return renderEnglishMirror(c, 'list', slug, 'ranking', 'list')
 })
-
+// Actor en inglÃ©s
+routes.get('/actor/:slug', async (c) => {
+  const slug = c.req.param('slug')
+  return renderEnglishMirror(c, 'actor', slug, 'actor', 'actor')
+})
 // â”€â”€ HTML 404 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const notFoundHtml = () => `
@@ -476,7 +526,7 @@ routes.get('/*', async (c) => {
       const ogData = {
         title,
         description,
-        image: media.poster_path ? `https://image.tmdb.org/t/p/w780${media.poster_path}` : '',
+        image: media.poster_path ? `${env.API_BASE_URL}/t/p/w780${media.poster_path}` : '',
         type: 'video.movie',
         url: canonical
       }
@@ -585,6 +635,43 @@ routes.get('/*', async (c) => {
       }
       const schema = itemListSchema(list)
       const body = `<main><section><h1>${title}</h1><p>${description}</p></section></main>`
+
+      return htmlWithCache(c, baseHtml(title, description, ogData.url, ogData, {
+        card: 'summary_large_image',
+        site: '@vimovies',
+        title: ogData.title,
+        description: ogData.description,
+        image: ogData.image
+      }, alternates, schema, body, locale), 'long')
+    }
+
+    // Actores
+    if (section === 'actor' && slug) {
+      const person = await PersonService.findBySlugWithFilmography(slug)
+      if (!person) {
+        return htmlWithCache(c, notFoundHtml(), 'none', 404)
+      }
+
+      const isEs = locale === 'es'
+      const title = `${person.person.name} - Actor | Vimovies`
+      const description = isEs 
+        ? `Descubre la filmografía completa, biografía y películas de ${person.person.name}. Todas sus películas y series en Vimovies.`
+        : `Discover the complete filmography, biography and movies of ${person.person.name}. All their movies and TV shows on Vimovies.`
+      const canonical = `https://vimovies.com/${isEs ? 'actor' : 'actor'}/${person.person.slug}`
+      const ogData = {
+        title,
+        description,
+        image: person.person.profile_path ? `${env.API_BASE_URL}/t/p/w780${person.person.profile_path}` : '',
+        type: 'profile',
+        url: canonical,
+        site_name: 'Vimovies'
+      }
+      const alternates = {
+        es: `https://vimovies.com/actor/${person.person.slug}`,
+        en: `https://vimovies.com/actor/${person.person.slug}`
+      }
+      const schema = personSchema(person.person)
+      const body = `<main><article><h1>${person.person.name}</h1><p>${description}</p></article></main>`
 
       return htmlWithCache(c, baseHtml(title, description, ogData.url, ogData, {
         card: 'summary_large_image',
