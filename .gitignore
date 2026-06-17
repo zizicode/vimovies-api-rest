@@ -1,4 +1,5 @@
 # Dependencies
+vimovies-router
 node_modules/
 .pnp/
 .pnp.js

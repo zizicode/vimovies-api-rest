@@ -67,11 +67,9 @@ sitemap.get('/robots.txt', (c) => {
 Allow: /
 
 # Rutas que NO deben indexarse
-Disallow: /api/
 Disallow: /admin/
 Disallow: /render/
 Disallow: /ssr/
-Disallow: /*?*
 
 # Sitemaps
 Sitemap: ${base}/sitemap.xml`
