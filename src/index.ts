@@ -24,8 +24,16 @@ app.use('*', cors({
     'http://localhost:5174',
     'http://localhost:3000',
   ],
-  credentials: true
+  credentials: true,
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  maxAge: 86400,
 }))
+
+// Handler para OPTIONS preflight requests
+app.options('*', (_c) => {
+  return new Response(null, { status: 204 })
+})
 
 // Middleware de detección de idioma (primero)
 app.use('*', localeMiddleware)
